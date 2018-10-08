@@ -74,6 +74,13 @@
         android:background="@color/colorPrimaryDark"
         android:paddingBottom="3dp"
         android:paddingTop="3dp">
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/red_trash"
+            android:contentDescription="@string/app_name"
+            android:id="@+id/delete_all_sms"
+            android:layout_marginRight="50dp"/>
         <TextView
             android:layout_height="match_parent"
             android:layout_width="wrap_content"

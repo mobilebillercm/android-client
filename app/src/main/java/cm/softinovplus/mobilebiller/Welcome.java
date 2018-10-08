@@ -15,9 +15,6 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import cm.softinovplus.mobilebiller.fragments.LoginFragment;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
@@ -27,7 +24,6 @@ import static android.Manifest.permission.RECEIVE_SMS;
 public class Welcome extends AppCompatActivity {
 
     private static FragmentManager fragmentManager;
-    private String sms_body;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,10 +107,7 @@ public class Welcome extends AppCompatActivity {
 
         // If savedinstnacestate is null then replace login fragment
         if (savedInstanceState == null) {
-            fragmentManager
-                    .beginTransaction()
-                    .replace(R.id.frameContainer, new LoginFragment(),
-                            Utils.LoginFragment).commit();
+            fragmentManager.beginTransaction().replace(R.id.frameContainer, new LoginFragment(), Utils.LoginFragment).commit();
         }
 
         // On close icon click finish activity
@@ -147,39 +140,13 @@ public class Welcome extends AppCompatActivity {
 
             Toast.makeText(getApplicationContext(), broadcast_receiver_initiated, Toast.LENGTH_LONG).show();
 
-            /*if (broadcast_receiver_initiated == null || !broadcast_receiver_initiated.equals(Utils.BROADCAST_RECEIVER_REGISTERED)){
-
-                Log.e("REGISTER", "REGISTER");
-
-                String smssendersJsonString = prefs.getString(Utils.SMS_SENDERS, null);
-
-                try {
-                    JSONArray jsonArray = new JSONArray(smssendersJsonString);
-                    List<String> smssenders =  new ArrayList<>();
-                    smssenders.add("691179154");
-                    for (int i=0; i<jsonArray.length(); i++){
-                        smssenders.add(jsonArray.getString(i));
-                    }
-                    SmsBroadcastReceiver receiver = new SmsBroadcastReceiver(smssenders);
-                    IntentFilter intentFilter = new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
-                    registerReceiver(receiver, intentFilter);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                //List<String> smssenders = prefs.get
-
-            }*/
         }
     }
 
     // Replace Login Fragment with animation
     public void replaceLoginFragment() {
-        fragmentManager
-                .beginTransaction()
-                .setCustomAnimations(R.anim.left_enter, R.anim.right_out)
-                .replace(R.id.frameContainer, new LoginFragment(),
-                        Utils.LoginFragment).commit();
+        fragmentManager.beginTransaction().setCustomAnimations(R.anim.left_enter, R.anim.right_out).
+                replace(R.id.frameContainer, new LoginFragment(), Utils.LoginFragment).commit();
     }
 
     public boolean checkPermission() {
@@ -192,16 +159,11 @@ public class Welcome extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestcode, String permissions[], int[] grantResults){
-        //Log.e("RequestCode", " " + requestcode);
         switch (requestcode){
             case Utils.RequestPermissionCode :{
-                Log.e("Nkalla0", "Nkalla1: " + (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED));
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Log.e("Nkalla1", "Nkalla1: " + (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS ) == PackageManager.PERMISSION_GRANTED));
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS ) == PackageManager.PERMISSION_GRANTED){
-                        //this.onResume();
-                        Log.e("Nkalla2", "Nkalla2: " + (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED));
-                        initializeMap();
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS ) == PackageManager.PERMISSION_GRANTED){
+                        //initializeMap();
                     }
                 }else {
                     Toast.makeText(getApplicationContext(), getString(R.string.you_mustgrant_permission), Toast.LENGTH_LONG).show();
@@ -218,12 +180,8 @@ public class Welcome extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
-        // Find the tag of signup and forgot password fragment
-        Fragment SignUpFragment = fragmentManager
-                .findFragmentByTag(Utils.SignUpFragment);
-        Fragment ForgotPasswordFragment = fragmentManager
-                .findFragmentByTag(Utils.ForgotPasswordFragment);
+        Fragment SignUpFragment = fragmentManager.findFragmentByTag(Utils.SignUpFragment);
+        Fragment ForgotPasswordFragment = fragmentManager.findFragmentByTag(Utils.ForgotPasswordFragment);
 
         // Check if both are null or not
         // If both are not null then replace login fragment else do backpressed

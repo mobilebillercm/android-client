@@ -34,7 +34,7 @@ import cm.softinovplus.mobilebiller.utils.Utils;
 public class Authenticated extends AppCompatActivity {
 
     private TextView usernameView;
-    private   Bundle token;
+    //private   Bundle token;
 
     private NavigationView mNavigationView;
     private DrawerLayout mDrawerLayout;
@@ -49,13 +49,11 @@ public class Authenticated extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticated);
-
-        token = getIntent().getExtras().getBundle("token");
-
+        SharedPreferences preferences = getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
 
         usernameView = (TextView) findViewById(R.id.username);
 
-        usernameView.setText(token.getString("username"));
+        usernameView.setText(preferences.getString(Utils.EMAIL,"Error@Error.com"));
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.shitstuff) ;
@@ -121,17 +119,23 @@ public class Authenticated extends AppCompatActivity {
                     MenuItem item = menu.getItem(i);
                     item.setVisible(true);
                 }
-                View header = mNavigationView.getHeaderView(0);
+                /*View header = mNavigationView.getHeaderView(0);
                 TextView connected_user_name = (TextView) header.findViewById(R.id.connected_user_name);
                 String string = "" + settings.getString(Utils.NAME, "") + " (" + settings.getString(Utils.EMAIL, "") + ")"
                         + "\n" + settings.getString(Utils.LIBELE_PDV, "");
-                connected_user_name.setText(token.getString("username"));
+                connected_user_name.setText(token.getString("username"));*/
                 mNavigationView.refreshDrawableState();
-                Log.e("entete", string);
+                //Log.e("entete", string);
 
                 super.onDrawerSlide(drawerView, slideOffset);
             }
         };
+
+        View header = mNavigationView.getHeaderView(0);
+        TextView connected_user_name = (TextView) header.findViewById(R.id.connected_user_name);
+        //String string = "" + settings.getString(Utils.NAME, "") + " (" + settings.getString(Utils.EMAIL, "") + ")"
+         //       + "\n" + settings.getString(Utils.LIBELE_PDV, "");
+        connected_user_name.setText(preferences.getString(Utils.EMAIL,"Error@Error.com"));
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 

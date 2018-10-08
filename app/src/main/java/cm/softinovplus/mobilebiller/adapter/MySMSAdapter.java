@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,6 +20,8 @@ import java.util.List;
 
 import cm.softinovplus.mobilebiller.BluetoothPrinterActivity;
 import cm.softinovplus.mobilebiller.R;
+import cm.softinovplus.mobilebiller.SMSsActivity;
+import cm.softinovplus.mobilebiller.db.SMSDataSource;
 import cm.softinovplus.mobilebiller.sms.SMS;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
@@ -92,15 +96,14 @@ public class MySMSAdapter extends BaseAdapter {
         from_result.setText(sms.getSms_sender());
 
         final TextView message_text = (TextView)v.findViewById(R.id.message_text);
-         int index = 30;
+         int index = 100;
 
-         if (sms.getSms_body().length() < 30 ){
+         if (sms.getSms_body().length() < 100 ){
              index = sms.getSms_body().length();
          }
 
-        message_text.setText(sms.getSms_body().substring(0,index));
+        message_text.setText(sms.getSms_body().substring(0,index) + " ...");
 
-        
         final Button imprimer_btn = (Button)v.findViewById(R.id.imprimer_btn);
         imprimer_btn.setOnClickListener(new OnClickListener() {
 			@Override
@@ -118,7 +121,16 @@ public class MySMSAdapter extends BaseAdapter {
        me_supprimer.setOnClickListener(new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			//((MainActivity) MainActivity.thisActivity).prepareRemoveSms(values, pos_);
+
+            /*SMSDataSource smsDatatSource = new SMSDataSource(context.getApplicationContext());
+            smsDatatSource.open();
+            smsDatatSource.deleteSMS(sms);
+            smsDatatSource.close();*/
+
+            SMSsActivity smsActivity = (SMSsActivity) context;
+            smsActivity.prepareRemoveSms(sms);
+            //SMSsActivity.refreshList();
+
 		}
 	});
         

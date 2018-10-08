@@ -61,49 +61,46 @@ import static cm.softinovplus.mobilebiller.utils.Utils.ForgotPasswordFragment;
 import static cm.softinovplus.mobilebiller.utils.Utils.SignUpFragment;
 
 public class LoginFragment extends Fragment implements OnClickListener {
-	private  View view;
 
-	private  EditText emailid, password;
-	private  Button loginButton;
-	private  TextView forgotPassword, signUp;
-	private  CheckBox show_hide_password;
-    //private  static TextView textView;
-	//private static LinearLayout loginLayout;
-	private static Animation shakeAnimation;
-	private static FragmentManager fragmentManager;
+    private View view;
 
-	public LoginFragment() {
+    private EditText emailid, password;
+    private Button loginButton;
+    private TextView forgotPassword, signUp;
+    private CheckBox show_hide_password;
+    private static Animation shakeAnimation;
+    private static FragmentManager fragmentManager;
 
-	}
+    public LoginFragment() {
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		view = inflater.inflate(R.layout.login_layout, container, false);
-		initViews();
-		setListeners();
-		return view;
-	}
+    }
 
-	// Initiate Views
-	private void initViews() {
-		fragmentManager = getActivity().getSupportFragmentManager();
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.login_layout, container, false);
+        initViews();
+        setListeners();
+        return view;
+    }
 
-		emailid = (EditText) view.findViewById(R.id.login_emailid);
-		password = (EditText) view.findViewById(R.id.login_password);
-		loginButton = (Button) view.findViewById(R.id.loginBtn);
-		forgotPassword = (TextView) view.findViewById(R.id.forgot_password);
-		signUp = (TextView) view.findViewById(R.id.createAccount);
-		show_hide_password = (CheckBox) view
-				.findViewById(R.id.show_hide_password);
-		//loginLayout = (LinearLayout) view.findViewById(R.id.login_layout);
+    // Initiate Views
+    private void initViews() {
+        fragmentManager = getActivity().getSupportFragmentManager();
 
-		// Load ShakeAnimation
-		shakeAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
+        emailid = (EditText) view.findViewById(R.id.login_emailid);
+        password = (EditText) view.findViewById(R.id.login_password);
+        loginButton = (Button) view.findViewById(R.id.loginBtn);
+        forgotPassword = (TextView) view.findViewById(R.id.forgot_password);
+        signUp = (TextView) view.findViewById(R.id.createAccount);
+        show_hide_password = (CheckBox) view.findViewById(R.id.show_hide_password);
+        //loginLayout = (LinearLayout) view.findViewById(R.id.login_layout);
+
+        // Load ShakeAnimation
+        shakeAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
         //textView = (TextView) view.findViewById(R.id.resultgetaccesstoken);
 
-		// Setting text selector over textviews
-		/*XmlResourceParser xrp = getResources().getXml(R.drawable.text_selector);
+        // Setting text selector over textviews
+        /*XmlResourceParser xrp = getResources().getXml(R.drawable.text_selector);
 		try {
 			ColorStateList csl = ColorStateList.createFromXml(getResources(), xrp);
 
@@ -112,124 +109,118 @@ public class LoginFragment extends Fragment implements OnClickListener {
 			signUp.setTextColor(csl);
 		} catch (Exception e) {
 		}*/
-	}
+    }
 
-	// Set Listeners
-	private void setListeners() {
-		loginButton.setOnClickListener(this);
-		forgotPassword.setOnClickListener(this);
-		signUp.setOnClickListener(this);
+    // Set Listeners
+    private void setListeners() {
+        loginButton.setOnClickListener(this);
+        forgotPassword.setOnClickListener(this);
+        signUp.setOnClickListener(this);
 
-		// Set check listener over checkbox for showing and hiding password
-		show_hide_password.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        // Set check listener over checkbox for showing and hiding password
+        show_hide_password.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-					@Override
-					public void onCheckedChanged(CompoundButton button,
-							boolean isChecked) {
+            @Override
+            public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+                // If it is checkec then show password else hide
+                // password
+                if (isChecked) {
 
-						// If it is checkec then show password else hide
-						// password
-						if (isChecked) {
+                    show_hide_password.setText(R.string.hide_pwd);// change
+                    // checkbox
+                    // text
+                    password.setInputType(InputType.TYPE_CLASS_TEXT);
+                    password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());// show password
+                } else {
+                    show_hide_password.setText(R.string.show_pwd);// change
+                    // checkbox
+                    // text
 
-							show_hide_password.setText(R.string.hide_pwd);// change
-																			// checkbox
-																			// text
+                    password.setInputType(InputType.TYPE_CLASS_TEXT
+                            | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    password.setTransformationMethod(PasswordTransformationMethod
+                            .getInstance());// hide password
+                }
 
-							password.setInputType(InputType.TYPE_CLASS_TEXT);
-							password.setTransformationMethod(HideReturnsTransformationMethod
-									.getInstance());// show password
-						} else {
-							show_hide_password.setText(R.string.show_pwd);// change
-																			// checkbox
-																			// text
+            }
+        });
+    }
 
-							password.setInputType(InputType.TYPE_CLASS_TEXT
-									| InputType.TYPE_TEXT_VARIATION_PASSWORD);
-							password.setTransformationMethod(PasswordTransformationMethod
-									.getInstance());// hide password
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.loginBtn:
+                checkValidation();
+                break;
+            case R.id.forgot_password:
+                // Replace forgot password fragment with animation
+                fragmentManager
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.right_enter, R.anim.left_out)
+                        .replace(R.id.frameContainer,
+                                new ForgotPasswordFragment(),
+                                Utils.ForgotPasswordFragment).commit();
+                break;
+            case R.id.createAccount:
 
-						}
+                // Replace signup frgament with animation
+                fragmentManager
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.right_enter, R.anim.left_out)
+                        .replace(R.id.frameContainer, new SignUpFragment(), SignUpFragment).commit();
+                break;
+        }
 
-					}
-				});
-	}
+    }
 
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.loginBtn:
-			checkValidation();
-			break;
-		case R.id.forgot_password:
+    // Check Validation before login
+    private void checkValidation() {
+        // Get email id and password
+        String getEmailId = emailid.getText().toString().trim();
+        String getPassword = password.getText().toString();
 
-			// Replace forgot password fragment with animation
-			fragmentManager
-					.beginTransaction()
-					.setCustomAnimations(R.anim.right_enter, R.anim.left_out)
-					.replace(R.id.frameContainer,
-							new ForgotPasswordFragment(),
-							Utils.ForgotPasswordFragment).commit();
-			break;
-		case R.id.createAccount:
+        // Check patter for email id
+        Pattern p = Pattern.compile(Utils.REGEX_EMAIL);
 
-			// Replace signup frgament with animation
-			fragmentManager
-					.beginTransaction()
-					.setCustomAnimations(R.anim.right_enter, R.anim.left_out)
-					.replace(R.id.frameContainer, new SignUpFragment(), SignUpFragment).commit();
-			break;
-		}
+        Matcher m = p.matcher(getEmailId);
 
-	}
+        // Check for both field is empty or not
+        if (getEmailId.equals("") || getEmailId.length() == 0 || getPassword.equals("") || getPassword.length() == 0) {
+            //loginLayout.startAnimation(shakeAnimation);
+            new CustomToast().Show_Toast(getActivity(), view, "Enter both credentials.");
 
-	// Check Validation before login
-	private void checkValidation() {
-		// Get email id and password
-		String getEmailId = emailid.getText().toString().trim();
-		String getPassword = password.getText().toString();
+        }
+        // Check if email id is valid or not
+        else if (!m.matches()) {
+            new CustomToast().Show_Toast(getActivity(), view, "Your Email Id is Invalid.");
+        }
 
-		// Check patter for email id
-		Pattern p = Pattern.compile(Utils.regEx);
-
-		Matcher m = p.matcher(getEmailId);
-
-		// Check for both field is empty or not
-		if (getEmailId.equals("") || getEmailId.length() == 0 || getPassword.equals("") || getPassword.length() == 0) {
-			//loginLayout.startAnimation(shakeAnimation);
-			new CustomToast().Show_Toast(getActivity(), view, "Enter both credentials.");
-
-		}
-		// Check if email id is valid or not
-		else if (!m.matches()){
-			new CustomToast().Show_Toast(getActivity(), view, "Your Email Id is Invalid.");
-		}
-
-		// Else do login and do your stuff
-		else{
-			Toast.makeText(getActivity(), "Do Login.", Toast.LENGTH_SHORT).show();
+        // Else do login and do your stuff
+        else {
+            Toast.makeText(getActivity(), "Do Login.", Toast.LENGTH_SHORT).show();
 
             ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.login_progrees_bar);
             progressBar.setVisibility(View.GONE);
 
-            GetAccessToken getAccessToken = new GetAccessToken(getContext(), progressBar, 1, "my secret", "password",
+            GetAccessToken getAccessToken = new GetAccessToken(getActivity(), progressBar, Utils.CLIENT_ID, Utils.CLIENT_SECRET, Utils.GRANT_TYPE,
                     emailid.getText().toString().trim(), password.getText().toString());
 
-            getAccessToken.execute("http://idea-cm.club/index.html");
+            getAccessToken.execute(Utils.ACCESS_TOKEN_URL);
+        }
 
-		}
 
+    }
 
-	}
-
-    private class GetAccessToken extends AsyncTask<String,Integer, String> {
+    private class GetAccessToken extends AsyncTask<String, Integer, String> {
         private ProgressBar dialog;
         private Context context;
-        private  int clientId;
+        private int clientId;
         private String clienSecret;
         private String grantType;
         private String username;
-        private  String pwd;
+        private String pwd;
         private int statusCode = 0;
+
         public GetAccessToken(Context context, ProgressBar dialog, int clientId, String clienSecret, String grantType, String username, String password) {
             this.context = context;
             this.clientId = clientId;
@@ -244,8 +235,6 @@ public class LoginFragment extends Fragment implements OnClickListener {
         protected void onPreExecute() {
             super.onPreExecute();
             this.dialog.setVisibility(View.VISIBLE);
-            //this.dialog.setMessage("Please wait while we are processing your request...");
-            //dialog.show();
         }
 
         @Override
@@ -263,7 +252,7 @@ public class LoginFragment extends Fragment implements OnClickListener {
                     urlConnection.setDoOutput(true);
                     //urlConnection.setRequestProperty("Content-Type","application/json");
                     String query = "client_id=" + this.clientId + "&client_secret=" + this.clienSecret + "&grant_type=" + this.grantType +
-                            "&username=" + this.username + "&password="+this.pwd;
+                            "&username=" + this.username + "&password=" + this.pwd;
                     Log.e("query", query);
                     OutputStream os = urlConnection.getOutputStream();
                     OutputStreamWriter out = new OutputStreamWriter(os);
@@ -317,7 +306,7 @@ public class LoginFragment extends Fragment implements OnClickListener {
 
                     }
 
-                    return e.getMessage() ;
+                    return e.getMessage();
                 }
             } catch (MalformedURLException e) {
                 JSONObject jsonObject = new JSONObject();
@@ -329,73 +318,192 @@ public class LoginFragment extends Fragment implements OnClickListener {
                     e1.printStackTrace();
                 }
                 return e.getMessage();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
 
             return resultat;
         }
+
         @Override
         protected void onPostExecute(String result) {
-            super.onPostExecute( result);
+            super.onPostExecute(result);
             if (dialog.getVisibility() == View.VISIBLE) {
                 dialog.setVisibility(View.GONE);
             }
 
-            TextView textView = (TextView) view.findViewById(R.id.resultgetaccesstoken);
+            TextView textView = view.findViewById(R.id.resultgetaccesstoken);
 
-            Intent intent = new Intent(getActivity().getApplicationContext(), Authenticated.class);
-            Bundle bundle = new Bundle();
-            bundle.putString("username", this.username);
-            intent.putExtra("token",bundle);
-
-
-            // Check if we're running on Android 5.0 or higher
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-                startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-            } else {
-                // Swap without transition
-                startActivity(intent);
-            }
-
-            SharedPreferences.Editor editor = getActivity().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE).edit();
-            editor.putString(Utils.EMAIL, this.username);
-            editor.putString(Utils.PASSWORD, this.pwd);
-            editor.putLong(Utils.ACCESS_TOKEN_EXPIRY_DATE, System.currentTimeMillis()+(1000*60*60*24));
-            editor.putString(Utils.TENANT, "MOBILE BILLER");
-            editor.apply();
-
-            /*try {
+            try {
                 JSONObject jsonObject = new JSONObject(result);
-                if (jsonObject.has("error")){
-                    textView.setText(jsonObject.getString("message"));
-                }else if (jsonObject.has("access_token") && jsonObject.has("token_type") && jsonObject.has("expires_in") && jsonObject.getInt("expires_in") > 0
-                        && jsonObject.has("refresh_token") ){
-
-                    Intent intent = new Intent(getActivity().getApplicationContext(), Authenticated.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("token_type", jsonObject.getString("token_type"));
-                    bundle.putInt("expires_in", jsonObject.getInt("expires_in"));
-                    bundle.putString("access_token", jsonObject.getString("access_token"));
-                    bundle.putString("refresh_token", jsonObject.getString("refresh_token"));
-                    bundle.putString("username", this.username);
-                    intent.putExtra("token",bundle);
-
-                    emailid.setText("");
-                    password.setText("");
-                    startActivity(intent);
-
-
+                if (jsonObject.has(Utils.ERROR)){
+                    textView.setText(jsonObject.getString(Utils.MESSAGE));
+                }else if (jsonObject.has(Utils.ACCESS_TOKEN) && jsonObject.has(Utils.TOKEN_TYPE) && jsonObject.has(Utils.EXPIRES_IN) && jsonObject.getInt(Utils.EXPIRES_IN) > 0
+                        && jsonObject.has(Utils.REFRESH_TOKEN) ){
+                    DoLogin doLogin = new DoLogin(this.context, this.dialog, this.username, this.pwd, jsonObject);
+                    doLogin.execute("http://idea-cm.club/soweda/id/public/api/users/" + this.username + "/login");
                 }else{
                     textView.setText("Woop Something went Wrong...");
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
-            }*/
+            }
 
-            Log.e("result" , result);
+            Log.e("result", result);
+        }
+    }
+
+    private class DoLogin extends AsyncTask<String, Integer, String> {
+        private ProgressBar dialog;
+        private Context context;
+        private String username;
+        private String pwd;
+        private JSONObject token;
+        private int statusCode = 0;
+
+        public DoLogin(Context context, ProgressBar dialog, String username, String password, JSONObject token) {
+            this.context = context;
+            this.dialog = dialog;
+            this.username = username;
+            this.pwd = password;
+            this.token = token;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.dialog.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String resultat = "";
+            String str_url = strings[0];
+            URL url = null;
+            try {
+                url = new URL(str_url);
+                HttpURLConnection urlConnection;
+                try {
+                    Log.e("URL", str_url);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setDoInput(true);
+                    urlConnection.setDoOutput(true);
+                    Log.e("ACCESSTOKEN", this.token.getString(Utils.ACCESS_TOKEN));
+                    urlConnection.setRequestProperty (Utils.AUTHORIZATION, Utils.BEARER + " " + this.token.getString(Utils.ACCESS_TOKEN));
+                    urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
+                    JSONObject body = new JSONObject();
+                    body.put(Utils.EMAIL, this.username);
+                    body.put(Utils.PASSWORD, this.pwd);
+                    String query = body.toString();//"email=" + this.username + "&password=" + this.pwd;
+                    Log.e("query", query);
+                    OutputStream os = urlConnection.getOutputStream();
+                    OutputStreamWriter out = new OutputStreamWriter(os);
+                    out.write(query);
+                    out.close();
+
+                    this.statusCode = urlConnection.getResponseCode();
+
+                    Log.e("statusCode", "4: " + statusCode);
+
+                    InputStream in = urlConnection.getInputStream();
+
+                    BufferedReader br = null;
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    try {
+                        br = new BufferedReader(new InputStreamReader(in));
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+
+                    } catch (IOException e) {
+                        return e.getMessage();
+                    } finally {
+                        if (br != null) {
+                            try {
+                                br.close();
+                            } catch (IOException e) {
+                                Log.e("Exception3", "3: " + e.getMessage());
+                                return e.getMessage();
+                            }
+                        }
+                    }
+                    in.close();
+                    //os.close();
+                    resultat = sb.toString();
+                    /*}else if (statusCode == 401){
+
+                    }*/
+
+                } catch (IOException e) {
+                    //Log.e("Exception2", "2: " + e.getMessage());
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("error", "invalid_credentials");
+                        jsonObject.put("message", "The user credentials were incorrect");
+                        return jsonObject.toString();
+                    } catch (JSONException e1) {
+                        //e1.printStackTrace();
+
+                    }
+
+                    return e.getMessage();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } catch (MalformedURLException e) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("error", "Wopp something went wrong");
+                    jsonObject.put("message", "Wopp something went wrong");
+                    return jsonObject.toString();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+                return e.getMessage();
+            }
+
+            return resultat;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (dialog.getVisibility() == View.VISIBLE) {
+                dialog.setVisibility(View.GONE);
+            }
+
+            TextView textView = view.findViewById(R.id.resultgetaccesstoken);
+            try {
+                JSONObject returnedResult = new JSONObject(result);
+                if (returnedResult.has("success") && returnedResult.getInt("success") == 1 && returnedResult.has("faillure") && returnedResult.getInt("faillure") == 0){
+
+                    SharedPreferences.Editor editor = getActivity().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE).edit();
+                    editor.putString(Utils.EMAIL, this.username);
+                    editor.putString(Utils.PASSWORD, this.pwd);
+                    editor.putString(Utils.TOKEN_TYPE, this.token.getString(Utils.TOKEN_TYPE));
+                    editor.putString(Utils.ACCESS_TOKEN, this.token.getString(Utils.ACCESS_TOKEN));
+                    editor.putLong(Utils.EXPIRES_IN, this.token.getLong(Utils.EXPIRES_IN));
+                    editor.putString(Utils.REFRESH_TOKEN, this.token.getString(Utils.REFRESH_TOKEN));
+                    editor.putString(Utils.TENANT, "MOBILE BILLER");
+                    editor.apply();
+
+                    Intent intent = new Intent(getActivity().getApplicationContext(), Authenticated.class);
+                    // Check if we're running on Android 5.0 or higher
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+                    } else {
+                        startActivity(intent);
+                    }
+
+                }else {
+                    textView.setText(returnedResult.getString("raison"));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.e("result", result);
         }
     }
 }

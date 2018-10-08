@@ -11,4 +11,5 @@
     <color name="button_selectorcolor">#9E9E9E</color>
 
     <color name="mycolor">#00F3FF</color>
+    <color name="mybackgroundcolor">#00FFFFFF</color>
 </resources>

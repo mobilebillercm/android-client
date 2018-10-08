@@ -29,14 +29,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="ELECTRONIC AND MOBILE TECHNOLOGY"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:textColor="@color/colorPrimaryDark"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text=""
         android:gravity="center"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorPrimaryDark"
         android:id="@+id/connected_user_name"/>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2px"
+        android:background="@color/colorPrimaryDark" />
 
 </LinearLayout>

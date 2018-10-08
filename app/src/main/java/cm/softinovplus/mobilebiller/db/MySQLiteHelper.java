@@ -19,7 +19,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_TRANSACTION_STATE = "transaction_state";
     public static final String COLUMN_TRANSACTION_BALANCE = "transaction_balance";
     public static final String COLUMN_TRANSACTION_CURRENCY = "transaction_currency";
-    public static final String COLUMN_SMS_SENDER = "sms_sender";
+	public static final String COLUMN_TRANSACTION_MADE_BY = "transaction_made_by";
+	public static final String COLUMN_SMS_SENDER = "sms_sender";
     public static final String COLUMN_SMS_DATE = "sms_date";
     public static final String COLUMN_SMS_BODY = "sms_body";
     public static final String COLUMN_SMS_RECEIVER = "sms_receiver";
@@ -43,6 +44,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             COLUMN_TRANSACTION_STATE + " text, " +
             COLUMN_TRANSACTION_BALANCE + " integer, " +
             COLUMN_TRANSACTION_CURRENCY + " text, " +
+			COLUMN_TRANSACTION_MADE_BY + " text, " +
             COLUMN_SMS_SENDER + " text, " +
             COLUMN_SMS_DATE + " text, " +
             COLUMN_SMS_BODY + " text, " +

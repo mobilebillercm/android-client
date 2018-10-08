@@ -288,7 +288,8 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                         tous_les_donnee.add(B);
                     }
 
-                    byte [] operations = sms.getTransaction_type().getBytes();
+                    String transactionType = (sms.getTransaction_type() == null)?" ":sms.getTransaction_type();
+                    byte [] operations = transactionType.getBytes();
                     for(int i=0; i<operations.length; i++){
                         Byte B = new Byte(operations[i]);
                         tous_les_donnee.add(B);
@@ -338,6 +339,41 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                     for(int i=0; i<compte_bene.length; i++){
                         Byte B = new Byte(compte_bene[i]);
                         tous_les_donnee.add(B);
+                    }
+
+                    if (sms.getTransaction_made_by() != null && !sms.getTransaction_made_by().equals("")){
+
+                        for(int i=0; i<bold.length; i++){
+                            Byte B = new Byte(bold[i]);
+                            tous_les_donnee.add(B);
+                        }
+
+                        for(int i=0; i<left.length; i++){
+                            Byte B = new Byte(left[i]);
+                            tous_les_donnee.add(B);
+                        }
+
+                        byte[] label_compte_madeby= "\r\nFacture de: " .getBytes(); //+ ;
+                        for(int i=0; i<label_compte_madeby.length; i++){
+                            Byte B = new Byte(label_compte_madeby[i]);
+                            tous_les_donnee.add(B);
+                        }
+
+                        for(int i=0; i<right.length; i++){
+                            Byte B = new Byte(right[i]);
+                            tous_les_donnee.add(B);
+                        }
+
+                        byte [] madeby = sms.getTransaction_made_by().getBytes();
+                        for(int i=0; i<madeby.length; i++){
+                            Byte B = new Byte(madeby[i]);
+                            tous_les_donnee.add(B);
+                        }
+
+                        for(int i=0; i<boldOff.length; i++){
+                            Byte B = new Byte(boldOff[i]);
+                            tous_les_donnee.add(B);
+                        }
                     }
 
 

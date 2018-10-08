@@ -5,14 +5,14 @@ public class SMS {
 	private long id, received_at;
 	private String transaction_type, transaction_beneficiary_name, transaction_beneficiary_account_number,
 			transaction_date, transaction_id, transaction_reference, transaction_state,
-			transaction_currency, sms_sender, sms_date, sms_body, sms_receiver, belongs_to, tenant;
+			transaction_currency, transaction_made_by, sms_sender, sms_date, sms_body, sms_receiver, belongs_to, tenant;
 	private int transaction_amount, transaction_balance, is_yet_printed, transaction_fees;
 	public SMS(){}
 
 	public SMS(long id, String transaction_type, int transaction_amount, String transaction_beneficiary_name,
 			   String transaction_beneficiary_account_number, String transaction_date, String transaction_id,
 			   String transaction_reference, int transaction_fees, String transaction_state, int transaction_balance,
-			   String transaction_currency, String sms_sender, String sms_date, String sms_body, String sms_receiver, String belongs_to, String tenant,
+			   String transaction_currency, String transaction_made_by, String sms_sender, String sms_date, String sms_body, String sms_receiver, String belongs_to, String tenant,
 			   long received_at, int is_yet_printed) {
 		this.id = id;
 		this.received_at = received_at;
@@ -25,6 +25,7 @@ public class SMS {
 		this.transaction_fees = transaction_fees;
 		this.transaction_state = transaction_state;
 		this.transaction_currency = transaction_currency;
+		this.transaction_made_by = transaction_made_by;
 		this.sms_sender = sms_sender;
 		this.sms_date = sms_date;
 		this.sms_body = sms_body;
@@ -196,6 +197,14 @@ public class SMS {
 		this.is_yet_printed = is_yet_printed;
 	}
 
+	public String getTransaction_made_by() {
+		return transaction_made_by;
+	}
+
+	public void setTransaction_made_by(String transaction_made_by) {
+		this.transaction_made_by = transaction_made_by;
+	}
+
 	@Override
 	public String toString() {
 		return "SMS{" +
@@ -209,6 +218,7 @@ public class SMS {
 				", transaction_reference='" + transaction_reference + '\'' +
 				", transaction_state='" + transaction_state + '\'' +
 				", transaction_currency='" + transaction_currency + '\'' +
+				", transaction_made_by='" + transaction_made_by + '\'' +
 				", sms_sender='" + sms_sender + '\'' +
 				", sms_date='" + sms_date + '\'' +
 				", sms_body='" + sms_body + '\'' +

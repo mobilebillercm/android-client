@@ -186,7 +186,7 @@
                 android:layout_weight="1"
                 android:text="@string/supprimer"
                 android:textSize="10sp"
-                android:textColor="#FF0000"
+                android:textColor="#ff0000"
                 android:drawableLeft="@drawable/red_trash"
                 android:drawablePadding="3dp"/>
 

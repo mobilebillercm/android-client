@@ -103,7 +103,7 @@ public class SignUpFragment extends Fragment implements OnClickListener {
 		String getConfirmPassword = confirmPassword.getText().toString();
 
 		// Pattern match for email id
-		Pattern p = Pattern.compile(Utils.regEx);
+		Pattern p = Pattern.compile(Utils.REGEX_EMAIL);
 		Matcher m = p.matcher(getEmailId);
 
 		// Check if all strings are null or not

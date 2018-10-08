@@ -32,6 +32,7 @@ public class SMSDataSource {
 			  MySQLiteHelper.COLUMN_TRANSACTION_STATE,
 			  MySQLiteHelper.COLUMN_TRANSACTION_BALANCE,
 			  MySQLiteHelper.COLUMN_TRANSACTION_CURRENCY,
+			  MySQLiteHelper.COLUMN_TRANSACTION_MADE_BY,
 			  MySQLiteHelper.COLUMN_SMS_SENDER,
 			  MySQLiteHelper.COLUMN_SMS_DATE,
 			  MySQLiteHelper.COLUMN_SMS_BODY,
@@ -59,7 +60,7 @@ public class SMSDataSource {
 	  public SMS createSMS(long id, String transaction_type, int transaction_amount, String transaction_beneficiary_name,
 						   String transaction_beneficiary_account_number, String transaction_date, String transaction_id,
 						   String transaction_reference, int transaction_fees, String transaction_state, int transaction_balance,
-						   String transaction_currency, String sms_sender, String sms_date, String sms_body, String sms_receiver, String belongs_to, String tenant,
+						   String transaction_currency, String transaction_made_by, String sms_sender, String sms_date, String sms_body, String sms_receiver, String belongs_to, String tenant,
 						   long received_at, int is_yet_printed) {
 	    ContentValues values = new ContentValues();
 	    values.put(MySQLiteHelper.COLUMN_ID, id);
@@ -74,6 +75,7 @@ public class SMSDataSource {
 		  values.put(MySQLiteHelper.COLUMN_TRANSACTION_STATE, transaction_state);
 		  values.put(MySQLiteHelper.COLUMN_TRANSACTION_BALANCE, transaction_balance);
 		  values.put(MySQLiteHelper.COLUMN_TRANSACTION_CURRENCY, transaction_currency);
+		  values.put(MySQLiteHelper.COLUMN_TRANSACTION_MADE_BY, transaction_made_by);
 		  values.put(MySQLiteHelper.COLUMN_SMS_SENDER, sms_sender);
 		  values.put(MySQLiteHelper.COLUMN_SMS_DATE, sms_date);
 		  values.put(MySQLiteHelper.COLUMN_SMS_BODY, sms_body);
@@ -117,7 +119,17 @@ public class SMSDataSource {
 		}
 		return  false;
 	  }
-	  
+
+	public boolean deleteAllSMS() {
+		int res = database.delete(MySQLiteHelper.TABLE_SMS, " 1 " , null);
+		if(res == 1){
+			Toast.makeText(mContext, "SMS supprime avec succes", Toast.LENGTH_LONG).show();
+			return  true;
+		} else {
+			Toast.makeText(mContext, "Ne peut etre supprime", Toast.LENGTH_LONG).show();
+			return  false;
+		}
+	}
 	  
 	  
 	  public List<SMS> getAllSMS() {
@@ -147,14 +159,15 @@ public class SMSDataSource {
 		  sms.setTransaction_state(cursor.getString(9));
 		  sms.setTransaction_balance(cursor.getInt(10));
 		  sms.setTransaction_currency(cursor.getString(11));
-		  sms.setSms_sender(cursor.getString(12));
-		  sms.setSms_date(cursor.getString(13));
-		  sms.setSms_body(cursor.getString(14));
-		  sms.setSms_receiver(cursor.getString(15));
-		  sms.setBelongs_to(cursor.getString(16));
-		  sms.setTenant(cursor.getString(17));
-		  sms.setReceived_at(cursor.getLong(18));
-		  sms.setIs_yet_printed(cursor.getInt(19));
+		  sms.setTransaction_made_by(cursor.getString(12));
+		  sms.setSms_sender(cursor.getString(13));
+		  sms.setSms_date(cursor.getString(14));
+		  sms.setSms_body(cursor.getString(15));
+		  sms.setSms_receiver(cursor.getString(16));
+		  sms.setBelongs_to(cursor.getString(17));
+		  sms.setTenant(cursor.getString(18));
+		  sms.setReceived_at(cursor.getLong(19));
+		  sms.setIs_yet_printed(cursor.getInt(20));
 
 		  Log.e("SMS FROM CURSOR", sms.toString());
 
