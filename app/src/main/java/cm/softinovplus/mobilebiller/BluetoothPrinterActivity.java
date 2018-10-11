@@ -64,20 +64,12 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
 
         thisActivity = this;
 
-        /*sms_data = getIntent().getExtras();//savedInstanceState;
-        if (sms_data == null){
-            finish();
-        }
-        Bundle bundle = sms_data.getBundle(Utils.data);
-        if (bundle == null){
-            finish();
-        }
-
-        sms_id = bundle.getLong(Utils.sms_id);*/
-
         SharedPreferences prefs = getSharedPreferences(Utils.APP_CONFIGURAION, MODE_PRIVATE);
 
-        sms_id = prefs.getLong("last_sms_id", 0);
+
+
+
+        sms_id = prefs.getLong(Utils.LAST_SMS_ID, 0);
 
         SMSDataSource dataSource = new SMSDataSource(getApplicationContext());
         dataSource.open();
@@ -95,35 +87,6 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
             }
             G_devices = G_bluetoothAdapter.getBondedDevices();
 
-            /*
-            SharedPreferences.Editor editor = getActivity().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE).edit();
-            editor.putString(Utils.EMAIL, this.username);
-            editor.putString(Utils.PASSWORD, this.pwd);
-            editor.putLong(Utils.ACCESS_TOKEN_EXPIRY_DATE, System.currentTimeMillis()+(1000*60*60*24));
-            editor.putString(Utils.TENANT, "MOBILE BILLER");
-            editor.apply();
-             */
-
-            /*SharedPreferences settings = getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
-            String username = settings.getString(Utils.EMAIL, "");
-            String tenant = settings.getString(Utils.TENANT, "");
-            //String pdv = settings.getString(Global.PDV, "");
-
-            String sms_d = "";
-            sms_d += "\r\nPDV: " + settings.getString(Utils.LIBELE_PDV, "");
-
-            sms_d += "\r\nAgent: " + username;
-            corps_message = "Le corps du message";
-            sms_d += "\r\nle: " + makeDate(System.currentTimeMillis());
-            sms_d += "\r\nRecu le: " + makeDate(System.currentTimeMillis());
-            sms_d += "\r\nExpediteur: " + "Moi meme";
-            sms_d += "\r\n\r\nMessage: " + "Long message" +
-                    "\r\n\r\nContact: " + "671747569" +
-                    "\r\n\r\n*****************************\r\n    \r\n     \r\n   \r\n";
-            //content_and_header = sms_d;
-
-            Log.e("print data", sms_d);*/
-
             MyBluetoothAdapter myBluetooth_adapter = new MyBluetoothAdapter(this, G_devices, sms);
             ListView listeView = (ListView) findViewById(R.id.bluetooth_list);
             listeView.setAdapter(myBluetooth_adapter);
@@ -131,23 +94,13 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     ProgressBar progressBar = view.findViewById(R.id.print_loader);
-                    MyAsyncTask mat = new MyAsyncTask((BluetoothDevice)G_devices.toArray()[position], sms, progressBar);
+                    MyAsyncTask mat = new MyAsyncTask(thisActivity,(BluetoothDevice)G_devices.toArray()[position], sms, progressBar);
                     mat.execute("");
                 }
             });
 
-            /*LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View header = (View)li.inflate(R.layout.bluetooth_listview_header,null);
-            listeView.addHeaderView(header);*/
-
         }
 
-        /*toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setLogo(R.drawable.ic_launcher);
-        getSupportActionBar().setDisplayUseLogoEnabled(true);*/
     }
 
     @SuppressLint("SimpleDateFormat") public static String makeDate(Long when){
@@ -156,15 +109,17 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
     }
 
 
-    private class MyAsyncTask extends AsyncTask<Object, Integer, Object> {
+    public static class MyAsyncTask extends AsyncTask<Object, Integer, Object> {
         private final BluetoothDevice mmDevice;
         private BluetoothSocket mysocket = null;
         private OutputStream mmOutStream;
         private ProgressBar dialog;
         private ArrayList<Byte> tous_les_donnee;
         private SMS sms;
+        private Context context;
 
-        public MyAsyncTask(BluetoothDevice bt_device_, SMS sms, ProgressBar dialog) {
+        public MyAsyncTask(Context context, BluetoothDevice bt_device_, SMS sms, ProgressBar dialog) {
+            this.context = context;
             mmDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(bt_device_.getAddress());
             this.sms = sms;
             this.sms.setTenant("Mobile Biller");
@@ -181,7 +136,7 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
         @Override
         protected Object doInBackground(Object... params) {
             //String data = (String) params[0];
-            TraiteImage traiteImage = new TraiteImage();
+            TraiteImage traiteImage = new TraiteImage(this.context);
             try {
                 mysocket = mmDevice.createInsecureRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
             } catch (IOException e) {
@@ -523,6 +478,14 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                     mysocket.close();
                     Log.e("END PRINT", "in normal");
                     //Toast.makeText(context, "in normal", Toast.LENGTH_LONG).show();
+                    SharedPreferences otherSharedPreferences = this.context.getSharedPreferences(Utils.APP_OTHER_CONFIGURAION, MODE_PRIVATE);
+                    long last_sms_id = otherSharedPreferences.getLong(Utils.LAST_SMS_ID,-1);
+                    if (last_sms_id == sms.getId()){
+                        SharedPreferences.Editor otherEditor = this.context.getSharedPreferences(Utils.APP_OTHER_CONFIGURAION, MODE_PRIVATE).edit();
+                        otherEditor.remove(Utils.LAST_SMS_ID);
+                        otherEditor.apply();
+                    }
+
                     return Utils.OK;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -637,7 +600,8 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                             tous_les_donnee.add(B);
                         }
 
-                        byte [] operations = sms.getTransaction_type().getBytes();
+                        String transactionType = (sms.getTransaction_type() == null)?" ":sms.getTransaction_type();
+                        byte [] operations = transactionType.getBytes();
                         for(int i=0; i<operations.length; i++){
                             Byte B = new Byte(operations[i]);
                             tous_les_donnee.add(B);
@@ -687,6 +651,41 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                         for(int i=0; i<compte_bene.length; i++){
                             Byte B = new Byte(compte_bene[i]);
                             tous_les_donnee.add(B);
+                        }
+
+                        if (sms.getTransaction_made_by() != null && !sms.getTransaction_made_by().equals("")){
+
+                            for(int i=0; i<bold.length; i++){
+                                Byte B = new Byte(bold[i]);
+                                tous_les_donnee.add(B);
+                            }
+
+                            for(int i=0; i<left.length; i++){
+                                Byte B = new Byte(left[i]);
+                                tous_les_donnee.add(B);
+                            }
+
+                            byte[] label_compte_madeby= "\r\nFacture de: " .getBytes(); //+ ;
+                            for(int i=0; i<label_compte_madeby.length; i++){
+                                Byte B = new Byte(label_compte_madeby[i]);
+                                tous_les_donnee.add(B);
+                            }
+
+                            for(int i=0; i<right.length; i++){
+                                Byte B = new Byte(right[i]);
+                                tous_les_donnee.add(B);
+                            }
+
+                            byte [] madeby = sms.getTransaction_made_by().getBytes();
+                            for(int i=0; i<madeby.length; i++){
+                                Byte B = new Byte(madeby[i]);
+                                tous_les_donnee.add(B);
+                            }
+
+                            for(int i=0; i<boldOff.length; i++){
+                                Byte B = new Byte(boldOff[i]);
+                                tous_les_donnee.add(B);
+                            }
                         }
 
 
@@ -808,7 +807,8 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                         }
 
                         String part2 = "\r\n\r\n" + sms.getTenant() + " Vous remercie pour votre confiance" +
-                                "\r\n\r\n______________________________\r\n\r\n\r\n                           \r\n";
+                                "\r\n\r\n________________________________\r\n\r\n\r\n" +
+                                "                           \r\n";
 
 
                         for(int i=0; i<boldOff.length; i++){
@@ -823,8 +823,6 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                             Byte B = new Byte(xxxx[i]);
                             tous_les_donnee.add(B);
                         }
-
-
                         byte [] tt = new byte [tous_les_donnee.size()];
                         for(int i=0; i<tous_les_donnee.size(); i++){
                             Byte B = (Byte)tous_les_donnee.get(i);

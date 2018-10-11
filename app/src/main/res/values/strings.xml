@@ -56,9 +56,45 @@
     <string name="message">Message</string>
     <string name="supprimer">Supprimer</string>
     <string name="imprimer">Imprimer</string>
-    <string name="listesms">Liste SMS</string>
+    <string name="mytransaction">Mes Transactions</string>
     <string name="pwd_label">Mot de Passe</string>
     <string name="pwd_hint_delete_sms">Mot de Passe</string>
     <string name="cancel">Annuler</string>
     <string name="OK">Supprimer</string>
+    <string name="policy_message">Politique de confidentialité de Mobile Biller</string>
+    <string name="refuser">Refuser</string>
+    <string name="accepter">Accepter</string>
+    <string name="messervices">Mes Services</string>
+    <string name="configurer_bluetoot">Configurer Bluetooth</string>
+    <string name="inviter">Inviter Un Collaborateur</string>
+    <string name="changermdp">Changer Mot De Passe</string>
+    <string name="current_password">Mot de Passe Courant</string>
+    <string name="new_password">Nouveau Mot de Passe</string>
+    <string name="new_password_confirmation">Confirmer le Nouveau mot de Passe</string>
+    <string name="change">Changer</string>
+    <string name="pwd_successfully_changed">Mot de Passe Modifie avec Succes</string>
+    <string name="failed_to_change_pwd">Echec de Modification du Mot de passe</string>
+    <string name="invite_user">Inviter un Collaborateur</string>
+    <string name="inite">Inviter</string>
+    <string name="are_you_sure">Etes Vous Sur de Vouloir vous Deconnecter?</string>
+
+    <string name="yes">Oui</string>
+    <string name="non">Non</string>
+    <string name="print_question">Imprimer?</string>
+    <string name="quit">Quitter</string>
+
+
+    <string-array name="regions">
+        <item>Adamaoua</item>
+        <item>Centre</item>
+        <item>Est</item>
+        <item>Extreme-Nord</item>
+        <item>Littoral</item>
+        <item>Nord</item>
+        <item>Nord-Ouest</item>
+        <item>Ouest</item>
+        <item>Sud</item>
+        <item>Sud-Ouest</item>
+    </string-array>
+
 </resources>

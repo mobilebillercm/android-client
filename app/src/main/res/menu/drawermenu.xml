@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/supprimer_tout"
-        android:icon="@drawable/delete24"
-        android:title="@string/supprimer_tout"/>
+
+    <item android:id="@+id/inviter"
+        android:icon="@drawable/plus"
+        android:title="@string/inviter"/>
+
+    <item android:id="@+id/setprinter"
+        android:icon="@drawable/printer"
+        android:title="@string/configurer_bluetoot"/>
+
+    <item android:id="@+id/changermdp"
+        android:icon="@drawable/gear"
+        android:title="@string/changermdp"/>
+
+    <item android:id="@+id/mestransactions"
+        android:icon="@drawable/transaction"
+        android:title="@string/mytransaction"/>
 
     <item android:id="@+id/deconnexion"
-        android:icon="@drawable/logout_rounde24"
+        android:icon="@drawable/logout"
         android:title="@string/deconnexion"/>
 
    <!-- <item android:title="Connexion"

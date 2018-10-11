@@ -1,5 +1,6 @@
 package cm.softinovplus.mobilebiller.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -29,8 +30,11 @@ public class TraiteImage {
 	private int mWidth;
 	private int mHeight;
 	private String mStatus;
+	private Context context;
 
-	public TraiteImage(){}
+	public TraiteImage(Context context){
+		this.context = context;
+	}
 	public JSONArray processImage(String path) {
 		if (path != null && path.length() > 0) {
 				List<byte[]> listebyte = get_print_image(path);
@@ -42,6 +46,7 @@ public class TraiteImage {
 		} else {
 			return null;
 		}
+
 	}
 	
 	
@@ -91,7 +96,7 @@ public class TraiteImage {
 			
 			InputStream in = null;
 			try {
-				in = BluetoothPrinterActivity.thisActivity.getResources().getAssets().open(file);
+				in = this.context.getResources().getAssets().open(file);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

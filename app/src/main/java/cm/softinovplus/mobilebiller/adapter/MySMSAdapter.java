@@ -1,6 +1,8 @@
 package cm.softinovplus.mobilebiller.adapter;
 
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,11 +16,15 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
+import java.util.Set;
 
 import cm.softinovplus.mobilebiller.BluetoothPrinterActivity;
+import cm.softinovplus.mobilebiller.PrintNewSMS;
 import cm.softinovplus.mobilebiller.R;
 import cm.softinovplus.mobilebiller.SMSsActivity;
 import cm.softinovplus.mobilebiller.db.SMSDataSource;
@@ -104,16 +110,61 @@ public class MySMSAdapter extends BaseAdapter {
 
         message_text.setText(sms.getSms_body().substring(0,index) + " ...");
 
-        final Button imprimer_btn = (Button)v.findViewById(R.id.imprimer_btn);
+         final ProgressBar progressBar = v.findViewById(R.id.print_loader);
+        Button imprimer_btn = (Button)v.findViewById(R.id.imprimer_btn);
         imprimer_btn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(context, BluetoothPrinterActivity.class);
-				Bundle bundle = new Bundle();
-                SharedPreferences.Editor editor = context.getSharedPreferences(Utils.APP_CONFIGURAION, MODE_PRIVATE).edit();
-                editor.putLong("last_sms_id", sms.getId());
-                editor.apply();
-				context.startActivity(intent);
+
+
+                SharedPreferences sharedPreferences = context.getSharedPreferences(Utils.APP_CONFIGURAION, MODE_PRIVATE);
+
+                String macaddress = sharedPreferences.getString(Utils.DEFAULT_MAC_ADDRESS, null);
+
+                Log.e("macaddress", "macaddress: " + macaddress);
+                if (macaddress != null){
+                    Log.e("macaddress", "macaddress1: " + macaddress);
+                    BluetoothAdapter G_bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                    if (G_bluetoothAdapter == null) {
+                        Intent intent = new Intent(context, BluetoothPrinterActivity.class);
+                        Bundle bundle = new Bundle();
+                        SharedPreferences.Editor editor = context.getSharedPreferences(Utils.APP_CONFIGURAION, MODE_PRIVATE).edit();
+                        editor.putLong(Utils.LAST_SMS_ID, sms.getId());
+                        editor.apply();
+                        context.startActivity(intent);
+                    } else {
+
+                        if (!G_bluetoothAdapter.isEnabled()) {
+                            G_bluetoothAdapter.enable();
+                        }
+                        Set<BluetoothDevice> G_devices = G_bluetoothAdapter.getBondedDevices();
+
+                        Object []devices = G_devices.toArray();
+                        BluetoothDevice choosenDevice = null;
+                        for (int i=0; i<devices.length; i++){
+                            BluetoothDevice device = (BluetoothDevice) devices[i];
+                            if (device.getAddress().equals(macaddress)){
+                                choosenDevice = device;
+                                break;
+                            }
+                        }
+                        if (choosenDevice != null){
+
+                            BluetoothPrinterActivity.MyAsyncTask mat = new BluetoothPrinterActivity.MyAsyncTask(context, choosenDevice, sms, progressBar);
+                            mat.execute("");
+                        }else {
+                            Toast.makeText(context, "No bluetooth choosen", Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                }else{
+                    Intent intent = new Intent(context, BluetoothPrinterActivity.class);
+                    Bundle bundle = new Bundle();
+                    SharedPreferences.Editor editor = context.getSharedPreferences(Utils.APP_CONFIGURAION, MODE_PRIVATE).edit();
+                    editor.putLong(Utils.LAST_SMS_ID, sms.getId());
+                    editor.apply();
+                    context.startActivity(intent);
+                }
 			}
 		});
         
@@ -121,16 +172,7 @@ public class MySMSAdapter extends BaseAdapter {
        me_supprimer.setOnClickListener(new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-
-            /*SMSDataSource smsDatatSource = new SMSDataSource(context.getApplicationContext());
-            smsDatatSource.open();
-            smsDatatSource.deleteSMS(sms);
-            smsDatatSource.close();*/
-
-            SMSsActivity smsActivity = (SMSsActivity) context;
-            smsActivity.prepareRemoveSms(sms);
-            //SMSsActivity.refreshList();
-
+            ((SMSsActivity) context).prepareRemoveSms(sms);
 		}
 	});
         

@@ -15,7 +15,10 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.github.angads25.filepicker.view.FilePickerDialog;
+
 import cm.softinovplus.mobilebiller.fragments.LoginFragment;
+import cm.softinovplus.mobilebiller.fragments.SignUpFragment;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
 import static android.Manifest.permission.READ_SMS;
@@ -37,6 +40,8 @@ public class Welcome extends AppCompatActivity {
         getWindow().setExitTransition(new Explode());
 
         setContentView(R.layout.activity_welcome);
+
+        overridePendingTransition(R.anim.left_out, R.anim.right_out);
 
        /* this.sms_body = "Transfert de 100000 FCFA effectue avec succes a DIDIER JUNIOR NKALLA EHAWE (237671747569) le 2018-09-26 09:30:45. FRAIS 250 FCFA. Transaction Id: 395587665 ; Reference: 123456789. Nouveau solde est: 33000 FCFA.";
 
@@ -170,6 +175,18 @@ public class Welcome extends AppCompatActivity {
                     finish();
                 }
                 return;
+            }
+            case FilePickerDialog.EXTERNAL_READ_PERMISSION_GRANT: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(SignUpFragment.dialogpicker!=null)
+                    {   //Show dialog if the read permission has been granted.
+                        SignUpFragment.dialogpicker.show();
+                    }
+                }
+                else {
+                    //Permission has not been granted. Notify the user.
+                    Toast.makeText(Welcome.this,"Permission is Required for getting list of files",Toast.LENGTH_SHORT).show();
+                }
             }
             default:{
 

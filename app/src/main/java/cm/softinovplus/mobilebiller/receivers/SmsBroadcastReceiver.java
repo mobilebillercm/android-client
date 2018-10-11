@@ -1,8 +1,10 @@
 package cm.softinovplus.mobilebiller.receivers;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +20,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.SmsMessage;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -28,10 +32,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cm.softinovplus.mobilebiller.BluetoothPrinterActivity;
+import cm.softinovplus.mobilebiller.PrintNewSMS;
 import cm.softinovplus.mobilebiller.R;
 import cm.softinovplus.mobilebiller.Welcome;
 import cm.softinovplus.mobilebiller.db.SMSDataSource;
+import cm.softinovplus.mobilebiller.fragments.LoginFragment;
 import cm.softinovplus.mobilebiller.sms.SMS;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
@@ -311,8 +316,9 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 //for Test
                 //Utils.TEST_SMS = sms;
                 SharedPreferences.Editor editor = context.getSharedPreferences(Utils.APP_CONFIGURAION, MODE_PRIVATE).edit();
-                editor.putLong("last_sms_id", sms.getId());
+                editor.putLong(Utils.LAST_SMS_ID, sms.getId());
                 editor.apply();
+
                 smsDatatSource.close();
 
                 // Create the NotificationChannel, but only on API 26+ because
@@ -342,23 +348,8 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 bigPictureStyle.setBigContentTitle("Pour Impression par blutooth");
 
 
-
-                boolean is_connected = false;
-                SharedPreferences prefs = context.getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
-
-                long connected_since = prefs.getLong(Utils.ACCESS_TOKEN_EXPIRY_DATE, 0);
-
-                long when = System.currentTimeMillis();
-
-                is_connected = (connected_since > when);
-
                 Intent notificationIntent  = null;
-
-                if(!is_connected){
-                    notificationIntent = new Intent(context.getApplicationContext(),Welcome.class);
-                } else{
-                    notificationIntent = new Intent(context.getApplicationContext(),BluetoothPrinterActivity.class);
-                }
+                notificationIntent = new Intent(context.getApplicationContext(),PrintNewSMS.class);
 
                 Bundle data = new Bundle();
                 data.putLong(Utils.sms_id, sms.getId());
@@ -366,7 +357,24 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
                 notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-                PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+                //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent,  PendingIntent.FLAG_UPDATE_CURRENT);
+
+                //////
+
+                TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(context);
+
+                taskStackBuilder.addParentStack(PrintNewSMS.class);
+                taskStackBuilder.addNextIntent(notificationIntent);
+
+                //PendingIntent notificationPendingIntent =
+                //PendingIntent.getActivity(context, 0, notificationIntent, 0);
+
+                PendingIntent notificationPendingIntent =
+                        taskStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                ///////
+
+
+
 
                 Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 long[] patterns =  {500,500,500,500,500,500,500,500,500};
@@ -378,16 +386,19 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                         .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.loggo))
                         .setStyle(bigPictureStyle)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setContentIntent(pendingIntent)
+                        .setContentIntent(notificationPendingIntent)
                         .setVibrate(patterns)
                         .setSound(soundUri)
                         .setLights(Color.CYAN, 500, 500)
                         .setAutoCancel(true);
 
+                Notification notification = mBuilder.build();
+                notification.flags = Notification.FLAG_AUTO_CANCEL;
+
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
                 // notificationId is a unique int for each notification that you must define
-                notificationManager.notify(Utils.NOTIFICATION_ID, mBuilder.build());
+                notificationManager.notify(Utils.NOTIFICATION_ID ++, notification);
             }
 
 

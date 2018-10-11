@@ -27,8 +27,9 @@ public class Utils {
     public static final String TAG_BOOT_EXECUTE_SERVICE = "BOOT_BROADCAST_SERVICE";
 
     public static final String INIT = "INIT";
+    public static final String DEFAULT_MAC_ADDRESS = "default_mac_address_bluetooth_device";
 
-    public static final int NOTIFICATION_ID = 1;
+    public static int NOTIFICATION_ID = 1;
     public static final String NAME = "name";
     public static final String LIBELE_PDV = "libele_pdv";
 
@@ -43,7 +44,7 @@ public class Utils {
 
     public static final String sms_id = "sms_id";
     public static final String data = "data";
-    public static final String ACCESS_TOKEN_EXPIRY_DATE          = "ACCESS_TOKEN_EXPIRY_DATE";
+
     public static final String KEYWORDPATTERN = "keywordpattern";
     public static final String TRANSACTIONTYPE = "transactiontype";
     public static final String REGULAREXPRESSION = "regularexpression";
@@ -64,6 +65,7 @@ public class Utils {
     public static final String MOBILEBILLERACCOUNT               = "mobilebillercreditaccount";
     public static final String APP_AUTHENTICATION                = "APP_AUTHENTICATION";
     public static final String APP_CONFIGURAION                  = "APP_CONFIGURAION";
+    public static final String APP_OTHER_CONFIGURAION            = "APP_CONFIGURAION";
     public static final String BROADCAST_RECEIVER_REGISTERED     = "BROADCAST_RECEIVER_REGISTERED";
     public static final String NOTIFICATION_CHANEL_ID            = "4289EE2E-B99C-11E8-B7C2-AC2B6EE888A2";
     public static final String OK                                = "ok";
@@ -77,6 +79,12 @@ public class Utils {
     public static final String BEARER                            = "Bearer";
     public static final String CONTENT_TYPE                      = "Content-Type";
     public static final String APPLICATION_JSON                  = "application/json";
+    public static final String PRIVACY_POLICY_ACCEPTED           = "accepted";
+    public static final String MOBILEBILLER_PRIVACY_POLICY       = "http://idea-cm.club/regles-pridesoft-mobile.html";
+    public static final String LAST_SMS_ID                       = "last_sms_id";
+
+    //public static final String ACCESS_TOKEN_EXPIRY_DATE          = "ACCESS_TOKEN_EXPIRY_DATE";
+
 
 
 

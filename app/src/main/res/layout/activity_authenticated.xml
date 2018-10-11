@@ -78,7 +78,7 @@
                     </LinearLayout>
                     <View
                         android:layout_width="fill_parent"
-                        android:layout_height="2px"
+                        android:layout_height="1dp"
                         android:background="@color/colorPrimaryDark" />
                 </LinearLayout>
 
@@ -87,30 +87,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
-            android:layout_below="@id/logo_content">
+            android:layout_below="@id/logo_content"
+            android:background="@color/white">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@color/white">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:id="@+id/contenu_titre">
-
+                    android:id="@+id/contenu_titre"
+                    android:background="@color/white">
                     <com.pkmmte.view.CircularImageView
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:id="@+id/logo"
                         app:border="true"
                         app:border_color="@color/mycolor"
-                        app:border_width="4dp"
+                        app:border_width="1dp"
                         app:shadow="true"
                         android:foregroundGravity="center"
                         android:visibility="gone"
                         />
-
                     <ProgressBar
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -122,30 +122,26 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/mobilebiller"
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:textColor="@color/colorPrimary"
                         android:layout_marginTop="20dp"
-                        android:textSize="30dp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
-                        android:id="@+id/titre"
+                        android:id="@+id/nom_entreprise"
+                        />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/username"
+                        android:textColor="@color/mycolor"
+                        android:textAlignment="center"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:layout_below="@id/nom_entreprise"
                         />
                 </RelativeLayout>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/login"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_marginTop="20dp"
-                    android:textSize="20dp"
-                    android:textStyle="bold"
-                    android:layout_below="@id/contenu_titre"
-                    android:id="@+id/soustitre"
-                    />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -154,48 +150,109 @@
                     android:paddingRight="20dp"
                     android:orientation="vertical"
                     android:layout_gravity="center"
-                    android:layout_below="@id/soustitre"
-
+                    android:layout_below="@id/contenu_titre"
+                    android:background="@color/white"
+                    android:layout_marginTop="30dp"
                     >
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/username"
-                        android:textColor="@color/mycolor"
-                        android:textAlignment="center"
+                    <ProgressBar
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:maxHeight="20dp"
+                        android:maxWidth="20dp"
+                        android:id="@+id/logout_loader"
                         android:layout_gravity="center"
-                        android:gravity="center"
-                        android:layout_marginTop="30dp"
-                        android:layout_marginBottom="30dp"
-                        />
-
-
-                    <Button
-                        android:id="@+id/btn_goto_bluetooth_devices"
+                        android:visibility="gone"/>
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:background="@drawable/button_bg"
-                        android:padding="3dp"
-                        android:text="@string/bluetooth"
-                        android:textColor="@android:color/white"
-                        android:textSize="17sp" />
+                        android:id="@+id/services"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/messervices"
+                            android:gravity="center"
+                            android:textColor="@color/colorPrimary"
+                            android:layout_marginTop="20dp"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:id="@+id/messervice"
+                            />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Service 1"
+                                android:textSize="14sp"
+                                />
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Delai: 23/03/2019"
+                                android:textSize="14sp"
+                                />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Service 1"
+                                android:textSize="14sp"
+                                android:textStyle="normal"
+                                />
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Delai: 23/03/2019"
+                                android:textSize="14sp"
+                                android:textStyle="normal"
+                                />
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                     <Button
                         android:id="@+id/btn_goto_bluetooth_sms"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:background="@drawable/button_bg"
+                        android:layout_marginTop="17dp"
+                        android:background="@drawable/border_blue"
                         android:padding="3dp"
-                        android:text="@string/listesms"
-                        android:textColor="@android:color/white"
+                        android:text="@string/mytransaction"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="17sp" />
+
+                    <Button
+                        android:id="@+id/btn_goto_bluetooth_devices"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="17dp"
+                        android:background="@drawable/border_blue"
+                        android:padding="3dp"
+                        android:text="@string/bluetooth"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="17sp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/white"
+                        android:text="void"/>
+
                 </LinearLayout>
             </RelativeLayout>
-
-
 
         </ScrollView>
 

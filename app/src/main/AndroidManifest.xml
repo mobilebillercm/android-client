@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -18,15 +19,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Welcome">
+        <activity
+            android:name=".Welcome"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Authenticated" />
-        <activity android:name=".BluetoothPrinterActivity" />
+        <activity
+            android:name=".Authenticated"
+            android:parentActivityName=".Welcome" />
+        <activity
+            android:name=".BluetoothPrinterActivity"
+            android:parentActivityName=".Authenticated" />
 
         <receiver
             android:name=".receivers.BootDeviceReceiver"
@@ -50,7 +57,19 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".SMSsActivity"></activity>
+        <activity android:name=".SMSsActivity" />
+        <activity android:name=".ChangePassword" />
+        <activity android:name=".InviteUser" />
+        <activity
+            android:name=".PrintNewSMS"
+            android:parentActivityName=".Welcome">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Welcome" />
+        </activity>
+        <activity android:name=".DefaulPrinterConfigActivity"></activity>
     </application>
 
 </manifest>

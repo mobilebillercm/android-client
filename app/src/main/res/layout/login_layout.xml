@@ -51,7 +51,7 @@
     </LinearLayout>
         <View
             android:layout_width="fill_parent"
-            android:layout_height="2px"
+            android:layout_height="1dp"
             android:background="@color/colorPrimaryDark" />
     </LinearLayout>
 
@@ -73,7 +73,7 @@
                 android:gravity="center"
                 android:textColor="@color/colorPrimary"
                 android:layout_marginTop="20dp"
-                android:textSize="30dp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:id="@+id/titre"
                 />
@@ -86,7 +86,7 @@
                 android:gravity="center"
                 android:textColor="@color/colorPrimary"
                 android:layout_marginTop="20dp"
-                android:textSize="20dp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_below="@id/titre"
                 android:id="@+id/soustitre"
@@ -100,7 +100,7 @@
                 android:orientation="vertical"
                 android:layout_gravity="center"
                 android:layout_below="@id/soustitre"
-
+                android:layout_marginBottom="50dp"
                 >
 
                 <android.support.design.widget.TextInputLayout
@@ -126,9 +126,48 @@
                         android:textColor="@color/mycolor"
                         android:textColorHint="@color/mycolor"
                         android:layout_marginBottom="10dp"
-                        android:textScaleX="1.3"
-                        android:textSize="20dp"/>
+                        android:textScaleX="1"
+                        android:textSize="16sp"/>
                 </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:id="@+id/tenant_layout"
+                android:visibility="gone"
+                >
+
+                <ProgressBar
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:id="@+id/progressBarGetTenant"
+                    android:visibility="gone"
+                    android:layout_gravity="center"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/entreprise"
+                    style="@style/TextView.InputLabel"
+                    />
+
+
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/spinner_tenant"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:spinnerMode="dropdown"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:outlineAmbientShadowColor="@color/mycolor"
+                    android:outlineSpotShadowColor="@color/mycolor"
+                    />
+                </LinearLayout>
+
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/input_layout_password"
@@ -151,8 +190,8 @@
                         android:textColor="@color/mycolor"
                         android:textColorHint="@color/mycolor"
                         android:layout_marginBottom="10dp"
-                        android:textScaleX="1.3"
-                        android:textSize="20dp" />
+                        android:textScaleX="1"
+                        android:textSize="16sp" />
                 </android.support.design.widget.TextInputLayout>
 
                 <LinearLayout
@@ -169,8 +208,7 @@
                         android:layout_weight="1"
                         android:text="@string/show_pwd"
                         android:textColor="@color/mycolor"
-                        android:textScaleX="1.1"
-                        android:textSize="20dp"/>
+                        android:textSize="14sp"/>
 
                     <TextView
                         android:id="@+id/forgot_password"
@@ -181,8 +219,8 @@
                         android:padding="5dp"
                         android:text="@string/forgot"
                         android:textColor="@color/mycolor"
-                        android:textScaleX="1.1"
-                        android:textSize="20dp"/>
+                        android:textScaleX="1"
+                        android:textSize="14sp"/>
                 </LinearLayout>
 
                 <TextView
@@ -193,7 +231,7 @@
                     android:text=""
                     android:textColor="#FF0000"
                     android:textScaleX="1"
-                    android:textSize="20dp"
+                    android:textSize="14sp"
                     android:id="@+id/resultgetaccesstoken"
                     />
 
@@ -211,11 +249,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
-                    android:background="@drawable/button_bg"
+                    android:background="@drawable/border_blue"
                     android:padding="3dp"
                     android:text="@string/login"
-                    android:textColor="@android:color/white"
-                    android:textSize="17sp" />
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/createAccount"
@@ -228,8 +266,8 @@
                     android:padding="5dp"
                     android:text="@string/newUser"
                     android:textColor="@color/mycolor"
-                    android:textScaleX="1.1"
-                    android:textSize="20dp"/>
+                    android:textSize="14sp"
+                    android:paddingBottom="30dp"/>
 
             </LinearLayout>
         </RelativeLayout>

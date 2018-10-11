@@ -183,12 +183,18 @@
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="35dp"
-                android:layout_weight="1"
+                android:layout_weight="4"
                 android:text="@string/supprimer"
                 android:textSize="10sp"
                 android:textColor="#ff0000"
                 android:drawableLeft="@drawable/red_trash"
                 android:drawablePadding="3dp"/>
+            <ProgressBar
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:id="@+id/print_loader"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/imprimer_btn"
@@ -196,7 +202,7 @@
                 android:layout_width="0dp"
                 android:textSize="10sp"
                 android:layout_height="35dp"
-                android:layout_weight="1"
+                android:layout_weight="4"
                 android:textColor="@color/mycolor"
                 android:text="@string/imprimer"
                 android:drawableLeft="@drawable/imprinante"
