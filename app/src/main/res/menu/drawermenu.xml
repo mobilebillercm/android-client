@@ -5,13 +5,16 @@
     <item android:id="@+id/inviter"
         android:icon="@drawable/plus"
         android:title="@string/inviter"/>
+    <item android:id="@+id/register"
+        android:icon="@drawable/register"
+        android:title="@string/signUp"/>
 
     <item android:id="@+id/setprinter"
         android:icon="@drawable/printer"
         android:title="@string/configurer_bluetoot"/>
 
     <item android:id="@+id/changermdp"
-        android:icon="@drawable/gear"
+        android:icon="@drawable/password_forgot"
         android:title="@string/changermdp"/>
 
     <item android:id="@+id/mestransactions"
@@ -21,6 +24,10 @@
     <item android:id="@+id/deconnexion"
         android:icon="@drawable/logout"
         android:title="@string/deconnexion"/>
+
+    <item android:id="@+id/recharge_my_account"
+        android:icon="@drawable/recharge"
+        android:title="@string/recharge"/>
 
    <!-- <item android:title="Connexion"
         android:id="@+id/se_connecter"

@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:id="@+id/changepwd_root_view">
+    android:background="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -69,7 +68,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/changermdp"
+                android:text=""
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textColor="@color/colorPrimary"
@@ -77,8 +76,36 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:id="@+id/titre"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginTop="20dp"
+                android:textSize="14sp"
+                android:id="@+id/account"
+                android:layout_below="@id/titre"
 
                 />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginTop="20dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_below="@id/account"
+                android:id="@+id/soustitre"
+                />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -86,116 +113,146 @@
                 android:paddingRight="20dp"
                 android:orientation="vertical"
                 android:layout_gravity="center"
-                android:layout_below="@id/titre"
+                android:layout_below="@id/soustitre"
                 android:layout_marginBottom="50dp"
                 >
 
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/input_layout_current_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="20dp">
-
-                    <EditText
-                        android:id="@+id/edit_current_password"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:drawablePadding="8dp"
-                        android:drawableLeft="@drawable/password"
-                        android:drawableStart="@drawable/password"
-                        android:gravity="center_vertical"
-                        android:hint="@string/current_password"
-                        android:inputType="textPassword"
-                        android:padding="10dp"
-                        android:textColor="@color/mycolor"
-                        android:textColorHint="@color/mycolor"
-                        android:layout_marginBottom="10dp"
-                        android:textScaleX="1"
-                        android:textSize="16sp"/>
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/input_layout_new_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="20dp">
-
-                    <EditText
-                        android:id="@+id/edit_new_password"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:drawablePadding="8dp"
-                        android:drawableLeft="@drawable/password"
-                        android:drawableStart="@drawable/password"
-                        android:gravity="center_vertical"
-                        android:hint="@string/new_password"
-                        android:inputType="textPassword"
-                        android:padding="10dp"
-                        android:textColor="@color/mycolor"
-                        android:textColorHint="@color/mycolor"
-                        android:layout_marginBottom="10dp"
-                        android:textScaleX="1"
-                        android:textSize="16sp"/>
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/input_layout_new_password_confirmation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="20dp">
-
-                    <EditText
-                        android:id="@+id/edit_new_password_confirmation"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:drawablePadding="8dp"
-                        android:drawableLeft="@drawable/password_forgot"
-                        android:drawableStart="@drawable/password_forgot"
-                        android:gravity="center_vertical"
-                        android:hint="@string/new_password_confirmation"
-                        android:inputType="textPassword"
-                        android:padding="10dp"
-                        android:textColor="@color/mycolor"
-                        android:textColorHint="@color/mycolor"
-                        android:layout_marginBottom="10dp"
-                        android:textScaleX="1"
-                        android:textSize="16sp"/>
-                </android.support.design.widget.TextInputLayout>
                 <ProgressBar
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
+                    android:layout_width="19dp"
+                    android:layout_height="19dp"
+                    android:id="@+id/mobilemoneyproviderloader"
                     android:layout_gravity="center"
-                    android:id="@+id/changepwd_loader"
-                    android:visibility="gone"
+                    android:visibility="gone"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical"
+                    android:id="@+id/mobilemoneyprovider_layout"
+                    >
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:background="#FFFFFF"
+                        android:id="@+id/mobilemoney_providername"
+                        android:layout_gravity="center"
+                        android:gravity="center"/>
+                    <!--<LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/network_provider"
+                            android:layout_marginRight="15dp"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/provider"
+                            style="@style/TextView.InputLabel"
+                            />
+                    </LinearLayout>
+
+
+                    <android.support.v7.widget.AppCompatSpinner
+                        android:id="@+id/spinner_mobilemoneyprovider"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:spinnerMode="dropdown"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:outlineAmbientShadowColor="@color/mycolor"
+                        android:outlineSpotShadowColor="@color/mycolor"
+                        />-->
+                </LinearLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/input_layout_city"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="20dp">
+
+                    <EditText
+                        android:id="@+id/edit_phonenumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:drawableLeft="@drawable/mobile_phone"
+                        android:drawableStart="@drawable/mobile_phone"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:hint="@string/phonenumber"
+                        android:inputType="phone"
+                        android:padding="10dp"
+                        android:textColor="@color/mycolor"
+                        android:textColorHint="@color/mycolor"
+                        android:layout_marginBottom="10dp"
+                        android:textScaleX="1"
+                        android:textSize="16sp"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/input_layout_holder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="20dp">
+
+                    <EditText
+                        android:id="@+id/edit_mobilemoneyholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:drawableLeft="@drawable/name"
+                        android:drawableStart="@drawable/name"
+                        android:drawablePadding="8dp"
+                        android:gravity="center_vertical"
+                        android:hint="@string/holder"
+                        android:inputType="textPersonName"
+                        android:padding="10dp"
+                        android:textColor="@color/mycolor"
+                        android:textColorHint="@color/mycolor"
+                        android:layout_marginBottom="10dp"
+                        android:textScaleX="1"
+                        android:textSize="16sp"/>
+                </android.support.design.widget.TextInputLayout>
+
+
+                <Button
+                    android:id="@+id/submit_mobilemoney_recharge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/border_blue"
+                    android:padding="3dp"
+                    android:text="@string/submit"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
                     />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/result_change_pwd"/>
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="15dp"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text=""
+                    android:textColor="@color/mycolor"
+                    android:textSize="14sp"
+                    android:paddingBottom="30dp"/>
 
-                <Button
-                    android:id="@+id/changepwd"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:background="@drawable/border_blue"
-                    android:padding="3dp"
-                    android:text="@string/change"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="16sp" />
             </LinearLayout>
         </RelativeLayout>
+
+
 
     </ScrollView>
 
@@ -225,10 +282,8 @@
             android:textColor="@android:color/white"
             android:background="@color/colorPrimaryDark"
             android:id="@+id/softinovplus"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="5px"
             />
     </LinearLayout>
 
 </RelativeLayout>
-
-

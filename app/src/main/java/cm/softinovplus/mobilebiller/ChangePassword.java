@@ -61,8 +61,9 @@ public class ChangePassword extends AppCompatActivity {
                     result_change_pwd.setText("");
                     DoChangePassword doChangePassword = new DoChangePassword(getApplicationContext(),
                             changepwd_loader,edit_current_password.getText().toString(), edit_new_password.getText().toString(),
-                            edit_new_password_confirmation.getText().toString(), authPreferences.getString(Utils.ACCESS_TOKEN, ""));
-                    doChangePassword.execute("http://idea-cm.club/soweda/id/public/api/users/" + authPreferences.getString(Utils.EMAIL,"") + "/change-password");
+                            edit_new_password_confirmation.getText().toString(), authPreferences.getString(Utils.TENANT_ID, ""),
+                            authPreferences.getString(Utils.ACCESS_TOKEN, ""));
+                    doChangePassword.execute(Utils.HOST_IDENTITY_AND_ACCESS + "api/users/" + authPreferences.getString(Utils.EMAIL,"") + "/change-password");
                 }
 
             }
@@ -80,15 +81,18 @@ public class ChangePassword extends AppCompatActivity {
         private String currentPassword;
         private String newPassword;
         private String newPasswordConfirmation;
+        private String tenantid;
         private String token;
         private int statusCode = 0;
 
-        public DoChangePassword(Context context, ProgressBar dialog, String currentPassword, String newPassword, String newPasswordConfirmation, String token) {
+        public DoChangePassword(Context context, ProgressBar dialog, String currentPassword,
+                                String newPassword, String newPasswordConfirmation, String tenantid, String token) {
             this.context = context;
             this.dialog = dialog;
             this.currentPassword = currentPassword;
             this.newPassword = newPassword;
             this.newPasswordConfirmation = newPasswordConfirmation;
+            this.tenantid = tenantid;
             this.token = token;
         }
 
@@ -114,12 +118,14 @@ public class ChangePassword extends AppCompatActivity {
                     urlConnection.setDoOutput(true);
                     Log.e("ACCESSTOKEN", this.token);
                     urlConnection.setRequestProperty (Utils.AUTHORIZATION, Utils.BEARER + " " + this.token);
-                    urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
-                    JSONObject body = new JSONObject();
-                    body.put("oldpassword", this.currentPassword);
-                    body.put("newpassword", this.newPassword);
-                    body.put("newpasswordconfirmation", this.newPasswordConfirmation);
-                    String query = body.toString();//"email=" + this.username + "&password=" + this.pwd;
+                    //urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
+                    //JSONObject body = new JSONObject();
+                    //body.put("oldpassword", this.currentPassword);
+                    //body.put("newpassword", this.newPassword);
+                    //body.put("newpasswordconfirmation", this.newPasswordConfirmation);
+                    String query = "oldpassword=" + this.currentPassword + "&newpassword=" + this.newPassword +
+                            "&newpasswordconfirmation=" + this.newPasswordConfirmation + "&tenantid=" + this.tenantid;
+                    //body.toString();//"email=" + this.username + "&password=" + this.pwd;
                     Log.e("query", query);
                     OutputStream os = urlConnection.getOutputStream();
                     OutputStreamWriter out = new OutputStreamWriter(os);
@@ -173,8 +179,6 @@ public class ChangePassword extends AppCompatActivity {
                     }
 
                     return e.getMessage();
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             } catch (MalformedURLException e) {
                 JSONObject jsonObject = new JSONObject();

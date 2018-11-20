@@ -2,6 +2,7 @@ package cm.softinovplus.mobilebiller;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -70,7 +71,7 @@ public class InviteUser extends AppCompatActivity {
         inviteBtn = findViewById(R.id.inviteBtn);
 
         authPreferences = getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
-        titre_invite_user.setText(authPreferences.getString(Utils.TENANT, ""));
+        titre_invite_user.setText(authPreferences.getString(Utils.TENANT_NAME, ""));
 
         spinner_region =  findViewById(R.id.spinner_region);
         invite_loader = findViewById(R.id.invite_loader);
@@ -113,9 +114,10 @@ public class InviteUser extends AppCompatActivity {
                 else {
 
                     result_invite_user.setText("");
-                    DoInviteUser doInviteUser = new DoInviteUser(getApplicationContext(), invite_loader,
-                            firstname, lastname, email, phone, selectedRegion, city, authPreferences.getString(Utils.ACCESS_TOKEN,""));
-                    doInviteUser.execute("http://idea-cm.club/soweda/id/public/api/users-invitations");
+                    DoInviteUser doInviteUser = new DoInviteUser(InviteUser.this, invite_loader,
+                            firstname, lastname, email, phone, selectedRegion, city, authPreferences.getString(Utils.USERID,""),
+                            authPreferences.getString(Utils.TENANT_ID,""), authPreferences.getString(Utils.ACCESS_TOKEN,""));
+                    doInviteUser.execute(Utils.HOST_IDENTITY_AND_ACCESS + "api/users-invitations?scope=" + Utils.SCOPE_MANAGE_IDENTITIES_AND_ACCESSES);
                 }
             }
         });
@@ -138,11 +140,11 @@ public class InviteUser extends AppCompatActivity {
         private String token;
         private ProgressBar dialog;
         private Context context;
-        private String firstname, lastname, email, phone, region, city;
+        private String firstname, lastname, email, phone, region, city, userid, tenantid;
         private int statusCode = 0;
 
         public DoInviteUser(Context context, ProgressBar dialog, String firstname, String lastname, String email,
-                        String phone, String region, String city, String token) {
+                        String phone, String region, String city, String userid, String tenantid,String token) {
             this.context = context;
             this.dialog = dialog;
             this.firstname = firstname;
@@ -151,6 +153,8 @@ public class InviteUser extends AppCompatActivity {
             this.phone = phone;
             this.city = city;
             this.region = region;
+            this.userid = userid;
+            this.tenantid = tenantid;
             this.token = token;
         }
 
@@ -176,21 +180,23 @@ public class InviteUser extends AppCompatActivity {
                     urlConnection.setDoOutput(true);
                     Log.e("ACCESSTOKEN", this.token);
                     urlConnection.setRequestProperty (Utils.AUTHORIZATION, Utils.BEARER + " " + this.token);
-                    urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
-                    JSONObject body = new JSONObject();
-                    body.put("firstname", this.firstname);
-                    body.put("lastname", this.lastname);
-                    body.put("email", this.email);
-                    body.put("phone", this.phone);
-                    body.put("city", this.city);
-                    body.put("region", this.region);
-                    String query = body.toString();//"email=" + this.username + "&password=" + this.pwd;
+                    //urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
+                    //JSONObject body = new JSONObject();
+                    //body.put("firstname", this.firstname);
+                    //body.put("lastname", this.lastname);
+                    //body.put("email", this.email);
+                    //body.put("phone", this.phone);
+                    //body.put("city", this.city);
+                    //body.put("region", this.region);
+                    String query = "firstname=" + this.firstname + "&lastname=" + this.lastname + "&email=" + this.email
+                            +"&tenantid=" + this.tenantid + "&phone1=" + this.phone + "&invited_by=" + this.userid +
+                            "&city=" + this.city + "&region=" + this.region;
+                    //body.toString();//"email=" + this.username + "&password=" + this.pwd;
                     Log.e("query", query);
                     OutputStream os = urlConnection.getOutputStream();
                     OutputStreamWriter out = new OutputStreamWriter(os);
                     out.write(query);
                     out.close();
-
                     this.statusCode = urlConnection.getResponseCode();
 
                     Log.e("statusCode", "4: " + statusCode);
@@ -238,8 +244,6 @@ public class InviteUser extends AppCompatActivity {
                     }
 
                     return e.getMessage();
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             } catch (MalformedURLException e) {
                 JSONObject jsonObject = new JSONObject();
@@ -266,17 +270,19 @@ public class InviteUser extends AppCompatActivity {
             try {
                 JSONObject returnedResult = new JSONObject(result);
                 if (returnedResult.has("success") && returnedResult.getInt("success") == 1 && returnedResult.has("faillure") && returnedResult.getInt("faillure") == 0){
-
-                    Log.e("Success signup", "OKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
-
+                    result_invite_user.setText(returnedResult.getString(Utils.RESPONSE));
+                    result_invite_user.setTextColor(Color.GREEN);
                 }else {
-                    result_invite_user.setText(returnedResult.getString("raison"));
+                    result_invite_user.setText(returnedResult.getString(Utils.RAISON));
+                    result_invite_user.setTextColor(Color.RED);
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                result_invite_user.setText("Whoop Something Went wrong!!!");
+                result_invite_user.setTextColor(Color.RED);
             }
 
-            Log.e("result", result);
+           // Log.e("result", result);
         }
     }
 }

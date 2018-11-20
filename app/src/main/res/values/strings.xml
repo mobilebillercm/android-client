@@ -82,6 +82,13 @@
     <string name="non">Non</string>
     <string name="print_question">Imprimer?</string>
     <string name="quit">Quitter</string>
+    <string name="recharge">Recharger Mon Compte</string>
+    <string name="mobilemoney">Mobile Money</string>
+    <string name="creditcard">Carte de Credit</string>
+    <string name="provider">Fournisseur</string>
+    <string name="phonenumber">Numero de Telphone</string>
+    <string name="holder">Titulaire</string>
+    <string name="chargement_configuration">Chargement de configurations</string>
 
 
     <string-array name="regions">

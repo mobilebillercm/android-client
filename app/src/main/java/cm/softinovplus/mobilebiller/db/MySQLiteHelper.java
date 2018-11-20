@@ -28,6 +28,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_TENANT = "tenant";
 	public static final String COLUMN_RECEIVED_AT = "received_at";
 	public static final String COLUMN_IS_YET_PRINTED = "is_yet_printed";
+	public static final String COLUMN_IS_ONLINE_SAVED = "is_online_saved";
+
 	public static final String DATABASE_NAME = "sms.db";
 	public static final int DATABASE_VERSION = 1;
 	
@@ -52,7 +54,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             COLUMN_BELONGS_TO + " text, " +
             COLUMN_TENANT + " text, " +
             COLUMN_RECEIVED_AT + " integer, " +
-            COLUMN_IS_YET_PRINTED + " integer" +
+            COLUMN_IS_YET_PRINTED + " integer, " +
+			COLUMN_IS_ONLINE_SAVED + " integer" +
             ")";
 
 	 public MySQLiteHelper(Context context) {

@@ -5,7 +5,7 @@ android {
     buildToolsVersion "28.0.1"
     defaultConfig {
         applicationId "cm.softinovplus.mobilebiller"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -25,7 +25,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     //implementation "com.android.support:support-compat:28.0.0"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:appcompat-v7:28.0.0'
     compile 'com.android.support:design:28.0.0'

@@ -16,6 +16,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,14 +41,14 @@ public class PrintNewSMS extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		boolean is_connected = false;
+		boolean is_connected = true;
 		SharedPreferences prefs = getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
 
-		long connected_since = prefs.getLong(Utils.EXPIRES_IN, 0);
+		//long connected_since = prefs.getLong(Utils.EXPIRES_IN, 0);
 
-		long when = System.currentTimeMillis();
+		//long when = System.currentTimeMillis();
 
-		is_connected = (connected_since > when);
+		//is_connected = (connected_since > when);
 
 		//SharedPreferences preferences = context.getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
 		String pref_email =  prefs.getString(Utils.EMAIL,null);
@@ -53,7 +57,7 @@ public class PrintNewSMS extends AppCompatActivity {
 		String pref_access_token = prefs.getString(Utils.ACCESS_TOKEN, null);
 		long pref_expires_in = prefs.getLong(Utils.EXPIRES_IN, -1);
 		String pref_refresh_token = prefs.getString(Utils.REFRESH_TOKEN,null);
-		is_connected = (is_connected && pref_email != null && pref_passowrd != null && pref_token_type != null
+		is_connected = (pref_email != null && pref_passowrd != null && pref_token_type != null
 				&& pref_access_token != null && !(pref_expires_in == -1) && pref_refresh_token != null);
 
 		if(!is_connected){
@@ -142,6 +146,41 @@ public class PrintNewSMS extends AppCompatActivity {
 								}
 							}
 							if (choosenDevice != null){
+
+                                SharedPreferences sharedPreferences_access_service = getSharedPreferences(Utils.APP_SERVICE_ACCESS, MODE_PRIVATE);
+
+                                boolean serviceValidity = false;
+                                boolean serviceFound = false;
+
+                                try {
+                                    String accesses = sharedPreferences_access_service.getString(Utils.SERVICE_ACCESS,"");
+                                    Log.e("ACCESSES", accesses);
+                                    JSONArray jsonArray = new JSONArray(accesses);
+
+                                    for (int i= 0; i<jsonArray.length(); i++){
+                                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                        if (jsonObject.getString(Utils.serviceid).equals(Utils.PRINT_SERVICE_ID)){
+                                            long startdate = jsonObject.getLong("startdate");
+                                            long enddate   = jsonObject.getLong("enddate");
+                                            long currentdate = jsonObject.getLong("currentdate");
+                                            if (startdate <= currentdate && currentdate <= enddate){
+                                                serviceValidity = true;
+                                            }
+                                            serviceFound = true;
+                                            break;
+                                        }
+                                    }
+
+                                } catch (JSONException e) {
+                                    Toast.makeText(getApplicationContext(), "Not Authorized", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                if (!serviceFound || !serviceValidity){
+                                    Toast.makeText(getApplicationContext(), "Not Authorized", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
 								ProgressBar progressBar = findViewById(R.id.print_loader);
 								BluetoothPrinterActivity.MyAsyncTask mat = new BluetoothPrinterActivity.MyAsyncTask(printSingleSMS_Self, choosenDevice, sms, progressBar);
 								mat.execute("");

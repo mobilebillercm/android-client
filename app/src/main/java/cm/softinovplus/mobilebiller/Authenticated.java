@@ -1,29 +1,25 @@
 package cm.softinovplus.mobilebiller;
 
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -31,6 +27,7 @@ import android.widget.TextView;
 
 import com.pkmmte.view.CircularImageView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,7 +42,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import cm.softinovplus.mobilebiller.dialog.LogoutDialog;
-import cm.softinovplus.mobilebiller.dialog.PolicyDialog;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
 public class Authenticated extends AppCompatActivity {
@@ -78,7 +74,7 @@ public class Authenticated extends AppCompatActivity {
         nom_entreprise = findViewById(R.id.nom_entreprise);
 
         usernameView.setText(authPreferences.getString(Utils.EMAIL,"Error@Error.com"));
-        nom_entreprise.setText(authPreferences.getString(Utils.TENANT,"Mobile Biller"));
+        nom_entreprise.setText(authPreferences.getString(Utils.TENANT_NAME, Utils.DEFAULT_TENANT_NAME));
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.shitstuff) ;
@@ -87,42 +83,53 @@ public class Authenticated extends AppCompatActivity {
         logo = (CircularImageView) findViewById(R.id.logo);
         logout_loader = findViewById(R.id.logout_loader);
 
-        DownloadImageTask downloadImageTask = new DownloadImageTask(logo, (ProgressBar) findViewById(R.id.id_image_loader));
-        downloadImageTask.execute("http://idea-cm.club/rongtaprinter.png");
         settings = getSharedPreferences(Utils.APP_CONFIGURAION, MODE_PRIVATE);
 
-        mNavigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                mDrawerLayout.closeDrawers();
                 if (menuItem.getItemId() == R.id.deconnexion) {
-
+                    mDrawerLayout.closeDrawers();
                     DoLogout doLogout = new DoLogout(getApplicationContext(), logout_loader, authPreferences.getString(Utils.EMAIL,""),
-                            authPreferences.getString(Utils.TENANT, ""), authPreferences.getString(Utils.ACCESS_TOKEN, ""));
-                    doLogout.execute("http://idea-cm.club/soweda/id/public/api/lougout-user/" + authPreferences.getString(Utils.EMAIL,""));
+                            authPreferences.getString(Utils.TENANT_ID, ""), authPreferences.getString(Utils.ACCESS_TOKEN, ""));
+                    doLogout.execute(Utils.HOST_IDENTITY_AND_ACCESS + "api/lougout-user/" + authPreferences.getString(Utils.EMAIL,"") + "/" + authPreferences.getString(Utils.TENANT_ID,""));
                 }
 
                 if (menuItem.getItemId() == R.id.changermdp) {
+                    mDrawerLayout.closeDrawers();
                     Intent intent = new Intent(getApplicationContext(), ChangePassword.class);
                     startActivity(intent);
                 }
 
                 if (menuItem.getItemId() == R.id.inviter) {
+                    mDrawerLayout.closeDrawers();
                     Intent intent = new Intent(getApplicationContext(), InviteUser.class);
                     startActivity(intent);
                 }
 
                 if (menuItem.getItemId() == R.id.mestransactions) {
+                    mDrawerLayout.closeDrawers();
                     Intent intent = new Intent(getApplicationContext(), SMSsActivity.class);
                     startActivity(intent);
                 }
 
                 if (menuItem.getItemId() == R.id.setprinter) {
+                    mDrawerLayout.closeDrawers();
                     Intent intent = new Intent(getApplicationContext(), DefaulPrinterConfigActivity.class);
                     startActivity(intent);
                 }
 
+                if (menuItem.getItemId() == R.id.recharge_my_account) {
+                    mDrawerLayout.closeDrawers();
+                    Intent intent = new Intent(getApplicationContext(), RechargeAccountMenu.class);
+                    startActivity(intent);
+                }
+
+                if (menuItem.getItemId() == R.id.register) {
+                    mDrawerLayout.closeDrawers();
+                    Intent intent = new Intent(getApplicationContext(), Signup.class);
+                    startActivity(intent);
+                }
 
                 return false;
             }
@@ -141,6 +148,18 @@ public class Authenticated extends AppCompatActivity {
                 mNavigationView.refreshDrawableState();
                 super.onDrawerSlide(drawerView, slideOffset);
             }
+            @Override
+            public void onDrawerClosed(View view) {
+                //getActionBar().setTitle(R.string.titre);
+                Log.e("Close Drawer", "fermeture du drawer");
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                //getActionBar().setTitle(R.string.titre_apres_ouverture);
+                Log.e("Open Drawer", "ouverture du drawer");
+                invalidateOptionsMenu();
+            }
         };
 
         header = mNavigationView.getHeaderView(0);
@@ -150,9 +169,10 @@ public class Authenticated extends AppCompatActivity {
          //       + "\n" + settings.getString(Utils.LIBELE_PDV, "");
         connected_user_name.setText(authPreferences.getString(Utils.EMAIL,"Error@Error.com"));
 
+        mDrawerToggle.syncState();
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
-        mDrawerToggle.syncState();
+
 
         /*toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,6 +212,16 @@ public class Authenticated extends AppCompatActivity {
             }
         });
 
+        //        public GetAccessTokenForService(Context context, int clientId, String clienSecret, String grantType, ProgressBar progressBar) {
+
+
+        BeginGetServices beginGetServices = new BeginGetServices(this, Utils.CLIENT_CLIENT_ID,
+                Utils.CLIENT_CLIENT_SECRET, Utils.CLIENT_GRANT_TYPE, (ProgressBar) findViewById(R.id.id_image_loader));
+        beginGetServices.execute(Utils.CLIENT_ACCESS_TOKEN_END_POINT);
+
+        DownloadImageTask downloadImageTask = new DownloadImageTask(logo, (ProgressBar) findViewById(R.id.id_image_loader));
+        downloadImageTask.execute(Utils.makeTenantLogoUrl(authPreferences.getString(Utils.TENANT_ID, "")));
+
     }
 
     @Override
@@ -211,6 +241,8 @@ public class Authenticated extends AppCompatActivity {
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         CircularImageView bmImage;
         ProgressBar progressBar;
+        private int statusCode;
+
         public DownloadImageTask(CircularImageView bmImage, ProgressBar progressBar) {
             this.bmImage = bmImage;
             this.progressBar = progressBar;//findViewById(R.id.id_image_loader);
@@ -223,25 +255,79 @@ public class Authenticated extends AppCompatActivity {
             this.bmImage.setVisibility(View.GONE);
         }
 
+
         @Override
+        protected Bitmap doInBackground(String... strings) {
+            String resultat = "";
+            String str_url = strings[0];
+            Bitmap bmp = null;
+            URL url = null;
+            try {
+                url = new URL(str_url);
+                HttpURLConnection urlConnection;
+                try {
+                    Log.e("TENANT URL", str_url);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.setDoInput(true);
+                    urlConnection.setRequestProperty (Utils.AUTHORIZATION, Utils.BEARER + " " + authPreferences.getString(Utils.ACCESS_TOKEN, ""));
+                    this.statusCode = urlConnection.getResponseCode();
+                    Log.e("statusCode", "4: " + statusCode);
+                    InputStream in = urlConnection.getInputStream();
+                    bmp = BitmapFactory.decodeStream(in);
+
+                } catch (IOException e) {
+                    //Log.e("Exception2", "2: " + e.getMessage());
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("error", "invalid_credentials");
+                        jsonObject.put("message", "something Went wrong");
+                    } catch (JSONException e1) {
+
+                    }
+
+                    return bmp;
+                }
+            } catch (MalformedURLException e) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("error", "Wopp something went wrong");
+                    jsonObject.put("message", "Wopp something went wrong");
+                    return bmp;
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+                return bmp;
+            }
+
+            return bmp;
+        }
+
+        /*@Override
         protected Bitmap doInBackground(String... urls) {
             String urldisplay = urls[0];
             Bitmap bmp = null;
             try {
                 InputStream in = new java.net.URL(urldisplay).openStream();
+
                 bmp = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
                 Log.e("Error", e.getMessage());
                 e.printStackTrace();
             }
             return bmp;
-        }
+        }*/
         @Override
         protected void onPostExecute(Bitmap result) {
-            bmImage.setVisibility(View.VISIBLE);
+            if (result != null){
+                bmImage.setVisibility(View.VISIBLE);
+                bmImage.setImageBitmap(result);
+                drawer_menu_header_photo.setImageBitmap(result);
+            }
+
             progressBar.setVisibility(View.GONE);
-            bmImage.setImageBitmap(result);
-            drawer_menu_header_photo.setImageBitmap(result);
+
+
         }
     }
 
@@ -274,12 +360,10 @@ public class Authenticated extends AppCompatActivity {
         ft.addToBackStack(null);
 
         DoLogout doLogout = new DoLogout(getApplicationContext(), logout_loader, authPreferences.getString(Utils.EMAIL,""),
-                authPreferences.getString(Utils.TENANT, ""), authPreferences.getString(Utils.ACCESS_TOKEN, ""));
-        //doLogout.execute("http://idea-cm.club/soweda/id/public/api/lougout-user/" + authPreferences.getString(Utils.EMAIL,""));
+                authPreferences.getString(Utils.TENANT_ID, ""), authPreferences.getString(Utils.ACCESS_TOKEN, ""));
 
         LogoutDialog logoutDialog = LogoutDialog.newInstance(doLogout, mStackLevel);
-        //QRCodeDialog qrCodeDialog = new QRCodeDialog();
-        //errorDialog.setErrorMessage(message);
+
         logoutDialog.show(ft, "dialog");
 
     }
@@ -322,11 +406,10 @@ public class Authenticated extends AppCompatActivity {
                     urlConnection.setDoOutput(true);
                     Log.e("ACCESSTOKEN", this.token);
                     urlConnection.setRequestProperty (Utils.AUTHORIZATION, Utils.BEARER + " " + this.token);
-                    urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
-                    JSONObject body = new JSONObject();
-                    body.put(Utils.EMAIL, this.username);
-                    body.put(Utils.TENANT, this.tenant);
-                    String query = body.toString();//"email=" + this.username + "&password=" + this.pwd;
+                    //urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
+                    //JSONObject body = new JSONObject();
+                    //body.put(Utils.EMAIL, this.username);
+                    String query = ""; //body.toString();//"email=" + this.username + "&password=" + this.pwd;
                     Log.e("query", query);
                     OutputStream os = urlConnection.getOutputStream();
                     OutputStreamWriter out = new OutputStreamWriter(os);
@@ -380,8 +463,6 @@ public class Authenticated extends AppCompatActivity {
                     }
 
                     return e.getMessage();
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             } catch (MalformedURLException e) {
                 JSONObject jsonObject = new JSONObject();
@@ -410,12 +491,300 @@ public class Authenticated extends AppCompatActivity {
             editor.remove(Utils.PASSWORD);
             editor.remove(Utils.NAME);
             editor.remove(Utils.EMAIL);
-            editor.remove(Utils.TENANT);
+            editor.remove(Utils.TENANT_ID);
             editor.apply();
 
             finish();
 
             Log.e("result", result);
+        }
+    }
+
+
+
+
+    private class GetServices extends AsyncTask<String, Integer, String> {
+        private ProgressBar dialog;
+        private Context context;
+        private String userid;
+        private String access_token;
+        private int statusCode = 0;
+
+        public GetServices(Context context, ProgressBar dialog, String userid, String access_token) {
+            this.context = context;
+            this.userid = userid;
+            this.dialog = dialog;
+            this.access_token = access_token;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.dialog.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String resultat = "";
+            String str_url = strings[0];
+            URL url = null;
+            try {
+                url = new URL(str_url);
+                HttpURLConnection urlConnection;
+                try {
+                    Log.e("URL", str_url);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.setDoInput(true);
+                    urlConnection.setRequestProperty (Utils.AUTHORIZATION, Utils.BEARER + " " + this.access_token);
+
+                    this.statusCode = urlConnection.getResponseCode();
+                    Log.e("statusCode", "4: " + statusCode);
+                    InputStream in = urlConnection.getInputStream();
+                    BufferedReader br = null;
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+
+                    try {
+                        br = new BufferedReader(new InputStreamReader(in));
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+
+                    } catch (IOException e) {
+                        return e.getMessage();
+                    } finally {
+                        if (br != null) {
+                            try {
+                                br.close();
+                            } catch (IOException e) {
+                                Log.e("Exception3", "3: " + e.getMessage());
+                                return e.getMessage();
+                            }
+                        }
+                    }
+                    in.close();
+                    //os.close();
+                    resultat = sb.toString();
+                    /*}else if (statusCode == 401){
+
+                    }*/
+
+                } catch (IOException e) {
+                    //Log.e("Exception2", "2: " + e.getMessage());
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("error", "invalid_credentials");
+                        jsonObject.put("message", "something Went wrong");
+                        return jsonObject.toString();
+                    } catch (JSONException e1) {
+                        //e1.printStackTrace();
+
+                    }
+
+                    return e.getMessage();
+                }
+            } catch (MalformedURLException e) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("error", "Wopp something went wrong");
+                    jsonObject.put("message", "Wopp something went wrong");
+                    return jsonObject.toString();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+                return e.getMessage();
+            }
+
+            return resultat;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (dialog.getVisibility() == View.VISIBLE) {
+                dialog.setVisibility(View.GONE);
+            }
+
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                if (jsonObject.has("success") && jsonObject.has("faillure") && jsonObject.getInt("success") == 1 && jsonObject.getInt("faillure") == 0 ){
+                    JSONArray jsonArray = jsonObject.getJSONArray(Utils.RESPONSE);
+                    LinearLayout listeservices = findViewById(R.id.listeservices);
+                    if (jsonArray.length() > 0){
+                        for (int i = 0; i<jsonArray.length(); i++){
+                            TextView serviceName = new TextView(Authenticated.this);
+                            serviceName.setTextColor(Color.rgb(100, 0, 0));
+                            serviceName.setText(jsonArray.getJSONObject(i).getString("name") + "      ");
+
+                            TextView serviceDelay = new TextView(Authenticated.this);
+                            serviceDelay.setTextColor(Color.rgb(100, 0, 0));
+                            serviceDelay.setText(Utils.makeDateDate(jsonArray.getJSONObject(i).getLong("enddate")) + "      ");
+
+                            LinearLayout myLinearLayout = new LinearLayout(Authenticated.this);
+                            myLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                            myLinearLayout.addView(serviceDelay, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                            myLinearLayout.addView(serviceName, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                            listeservices.addView(myLinearLayout, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                        }
+                    }else {
+                        TextView noservicefound = new TextView(Authenticated.this);
+                        noservicefound.setTextColor(Color.rgb(100, 0, 0));
+                        noservicefound.setText("Vous n'avez souscrit a aucun service !!!");
+                        LinearLayout myLinearLayout = new LinearLayout(Authenticated.this);
+                        myLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                        myLinearLayout.addView(noservicefound, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                        listeservices.addView(myLinearLayout, 0, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                    }
+
+
+                }else{
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.e("SERVICES ", result);
+        }
+    }
+
+    private class BeginGetServices extends AsyncTask<String, Integer, String> {
+        private int clientId;
+        private String clienSecret;
+        private String grantType;
+        private Context context;
+        private int statusCode = 0;
+        private ProgressBar dialog;
+
+        public BeginGetServices(Context context, int clientId, String clienSecret, String grantType, ProgressBar progressBar) {
+            this.context = context;
+            this.clientId = clientId;
+            this.clienSecret = clienSecret;
+            this.grantType = grantType;
+            this.dialog = progressBar;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.dialog.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String resultat = "";
+            String str_url = strings[0];
+            URL url = null;
+            try {
+                url = new URL(str_url);
+                HttpURLConnection urlConnection;
+                try {
+                    Log.e("query", str_url);
+
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setDoInput(true);
+                    urlConnection.setDoOutput(true);
+                    String query = "client_id=" + this.clientId + "&client_secret=" + this.clienSecret + "&grant_type=" + this.grantType ;
+                    Log.e("query", query);
+                    OutputStream os = urlConnection.getOutputStream();
+                    OutputStreamWriter out = new OutputStreamWriter(os);
+                    out.write(query);
+                    out.close();
+
+                    this.statusCode = urlConnection.getResponseCode();
+
+                    Log.e("statusCode", "4: " + statusCode);
+
+                    //if (statusCode ==  200) {
+                    InputStream in = urlConnection.getInputStream();
+
+                    BufferedReader br = null;
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    try {
+                        br = new BufferedReader(new InputStreamReader(in));
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+
+                    } catch (IOException e) {
+                        return e.getMessage();
+                    } finally {
+                        if (br != null) {
+                            try {
+                                br.close();
+                            } catch (IOException e) {
+                                Log.e("Exception3", "3: " + e.getMessage());
+                                return e.getMessage();
+                            }
+                        }
+                    }
+                    in.close();
+                    resultat = sb.toString();
+
+                } catch (IOException e) {
+                    //Log.e("Exception2", "2: " + e.getMessage());
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("error", "invalid_credentials");
+                        jsonObject.put("message", "The user credentials were incorrect       \n\n" + e.getMessage());
+                        return jsonObject.toString();
+                    } catch (JSONException e1) {
+                        //e1.printStackTrace();
+
+                    }
+
+                    return e.getMessage();
+                }
+            } catch (MalformedURLException e) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("error", "Wopp something went wrong");
+                    jsonObject.put("message", "Wopp something went wrong");
+                    return jsonObject.toString();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+                return e.getMessage();
+            }
+
+            return resultat;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (dialog.getVisibility() == View.VISIBLE) {
+                dialog.setVisibility(View.GONE);
+            }
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                if (jsonObject.has(Utils.ERROR)){
+                }else if (jsonObject.has(Utils.ACCESS_TOKEN) && jsonObject.has(Utils.TOKEN_TYPE) && jsonObject.has(Utils.EXPIRES_IN) && jsonObject.getInt(Utils.EXPIRES_IN) > 0){
+                    SharedPreferences.Editor editor = context.getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE).edit();
+                    editor.putString(Utils.CLIENT_ACCESS_TOKEN, jsonObject.getString(Utils.ACCESS_TOKEN));
+                    editor.apply();
+                    GetServices getServices = new GetServices(Authenticated.this, (ProgressBar) findViewById(R.id.id_image_loader), authPreferences.getString(Utils.USERID, ""),
+                            jsonObject.getString(Utils.ACCESS_TOKEN));
+                    getServices.execute(Utils.HOST_CLIENT + "api/services/" + authPreferences.getString(Utils.USERID,""));
+                    //        public GetServices(Context context, ProgressBar dialog, String email, String access_token) {
+
+                    /*RechargeAccountMenu.GetBalance getBalance = new RechargeAccountMenu.GetBalance(RechargeAccountMenu.this, balanceloader,
+                            preferencesAuth.getString(Utils.EMAIL, "Error@Error.cm"), jsonObject.getString(Utils.ACCESS_TOKEN));
+                    getBalance.execute(Utils.HOST_WALLET + "api/mobilebillercreditaccounts/" + preferencesAuth.getString(Utils.EMAIL,"") + "?query=balance");*/
+                }else{
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.e("access_token", result);
         }
     }
 

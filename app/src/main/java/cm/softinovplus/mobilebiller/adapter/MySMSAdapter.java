@@ -20,6 +20,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.Set;
 
@@ -149,6 +153,40 @@ public class MySMSAdapter extends BaseAdapter {
                             }
                         }
                         if (choosenDevice != null){
+
+                            SharedPreferences sharedPreferences_access_service = context.getSharedPreferences(Utils.APP_SERVICE_ACCESS, MODE_PRIVATE);
+
+                            boolean serviceValidity = false;
+                            boolean serviceFound = false;
+
+                            try {
+                                String accesses = sharedPreferences_access_service.getString(Utils.SERVICE_ACCESS,"");
+                                Log.e("ACCESSES", accesses);
+                                JSONArray jsonArray = new JSONArray(accesses);
+
+                                for (int i= 0; i<jsonArray.length(); i++){
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    if (jsonObject.getString(Utils.serviceid).equals(Utils.PRINT_SERVICE_ID)){
+                                        long startdate = jsonObject.getLong("startdate");
+                                        long enddate   = jsonObject.getLong("enddate");
+                                        long currentdate = jsonObject.getLong("currentdate");
+                                        if (startdate <= currentdate && currentdate <= enddate){
+                                            serviceValidity = true;
+                                        }
+                                        serviceFound = true;
+                                        break;
+                                    }
+                                }
+
+                            } catch (JSONException e) {
+                                Toast.makeText(context.getApplicationContext(), "Not Authorized", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+
+                            if (!serviceFound || !serviceValidity){
+                                Toast.makeText(context.getApplicationContext(), "Not Authorized", Toast.LENGTH_LONG).show();
+                                return;
+                            }
 
                             BluetoothPrinterActivity.MyAsyncTask mat = new BluetoothPrinterActivity.MyAsyncTask(context, choosenDevice, sms, progressBar);
                             mat.execute("");

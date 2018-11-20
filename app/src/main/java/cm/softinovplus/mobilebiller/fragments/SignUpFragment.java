@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -78,8 +80,7 @@ public class SignUpFragment extends Fragment  {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		view = inflater.inflate(R.layout.signup_layout, container, false);
 		initViews();
 		setListeners();
@@ -178,7 +179,7 @@ public class SignUpFragment extends Fragment  {
 
                     DoSignup doSignup = new DoSignup(getActivity(), signup_loader,entreprise, description,
                             firstname, lastname, email, password, passwordConfirmation,logo_selected_path, phone, selectedRegion, city);
-                    doSignup.execute("http://idea-cm.club/tenants.php");
+                    doSignup.execute(/*"http://idea-cm.club/tenants.php"*/Utils.SIGNUP_URL);
                 }
 
 
@@ -307,11 +308,33 @@ public class SignUpFragment extends Fragment  {
             URL url = null;
             try {
 
-                String urlParameters  = Utils.EMAIL + "=" + this.email + "&" + Utils.PASSWORD + "=" +
-                        this.password + "&compagny=" + this.entreprise + "&compagny_description=" + this.description + "&=firstname" + this.firstname
-                        + "&lastname=" + this.lastname +"&phone=" + this.phone + "&city=" + this.city + "&region=" + this.region+
-                        "&password_confirmation=" + this.password_confirmation;
-                url = new URL(str_url + "?" + urlParameters);
+                /*String urlParameters  = "administratoremail=" + this.email + "&" +  "adminitratorpassword=" +
+                        this.password + "&tenantname=" + this.entreprise + "&tenantdescrition=" + this.description + "&administratorfirstname=" + this.firstname
+                        + "&administratorlastname=" + this.lastname +"&administratorphone=" + this.phone + "&tenantcity=" + this.city + "&tenantregion=" + this.region+
+                        "&adminitratorpassword_confirmation=" + this.password_confirmation;*/
+
+                Uri.Builder builder = new Uri.Builder();
+                builder.scheme("http")
+                        .authority("212.237.7.253")
+                        .appendPath("mobilebiller")
+                        .appendPath("ide")
+                        .appendPath("public")
+                        .appendPath("api")
+                        .appendPath("tenants-provisions")
+                        .appendQueryParameter("administratoremail", this.email)
+                        .appendQueryParameter("adminitratorpassword", this.password)
+                        .appendQueryParameter("tenantname", this.entreprise)
+                        .appendQueryParameter("tenantdescrition", this.description)
+                        .appendQueryParameter("administratorfirstname", this.firstname)
+                        .appendQueryParameter("administratorlastname", this.lastname)
+                        .appendQueryParameter("administratorphone", this.phone)
+                        .appendQueryParameter("tenantcity", this.city)
+                        .appendQueryParameter("tenantregion", this.region)
+                        .appendQueryParameter("adminitratorpassword_confirmation", this.password_confirmation);
+
+                String urlParameters = builder.build().toString();
+
+                url = new URL(/*str_url + "?" +*/ urlParameters);
 
 
 
@@ -323,7 +346,7 @@ public class SignUpFragment extends Fragment  {
                 String boundary = "*****";
                 int bytesRead, bytesAvailable, bufferSize;
                 byte[] buffer;
-                int maxBufferSize = 1 * 1024 * 1024;
+                int maxBufferSize = 2048;
 
                 try {
 
@@ -346,17 +369,19 @@ public class SignUpFragment extends Fragment  {
                         urlConnection.setRequestProperty("Connection", "Keep-Alive");
                         urlConnection.setRequestProperty("ENCTYPE", "multipart/form-data");
                         urlConnection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-                        urlConnection.setRequestProperty("logo", sourceFile.getAbsolutePath());
+                        urlConnection.setRequestProperty("tenantlogo", sourceFile.getAbsolutePath());
                         dos = new DataOutputStream(urlConnection.getOutputStream());
                         dos.writeBytes(twoHyphens + boundary + lineEnd);
-                        dos.writeBytes("Content-Disposition: form-data; name=\""+"logo"+"\";filename=\"" +this.logoPath+ "\"" + lineEnd);
+                        dos.writeBytes("Content-Disposition: form-data; name=\""+"tenantlogo"+"\";filename=\"" +sourceFile.getAbsolutePath()+ "\"" + lineEnd);
 
                         dos.writeBytes(lineEnd);
 
-                        Log.e("3333333333333333333333","333333333333333333333333333333333333333333333333");
+                        //Log.e("3333333333333333333333","333333333333333333333333333333333333333333333333");
 
                         // create a buffer of maximum size
                         bytesAvailable = fileInputStream.available();
+
+
 
                         bufferSize = Math.min(bytesAvailable, maxBufferSize);
                         buffer = new byte[bufferSize];
@@ -378,15 +403,16 @@ public class SignUpFragment extends Fragment  {
                         // data...
                         dos.writeBytes(lineEnd);
                         dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-                        Log.e("444444444444","44444444444444444444444444444444444444444444444444444444444");
+                        dos.flush();
+                        //Log.e("444444444444","44444444444444444444444444444444444444444444444444444444444");
 
-                        // Responses from the server (code and message)
-                        int serverResponseCode = urlConnection.getResponseCode();
-                        String serverResponseMessage = urlConnection.getResponseMessage();
+                        Log.e("serverResponseCode", " " + urlConnection.getResponseCode());
 
+                        //Log.e("00000000000000","000000000000000000000000000000000000000000000000000000000");
+                        //dos.close();
                         InputStream in = urlConnection.getInputStream();
 
-                        Log.e("serverResponseCode", " " + serverResponseCode);
+                       // Log.e("serverResponseCode", " " + serverResponseCode);
 
                         //urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
                         /*JSONObject body = new JSONObject();
@@ -400,7 +426,6 @@ public class SignUpFragment extends Fragment  {
                         body.put("city", this.city);
                         body.put("region", this.region);
 
-                        //body.put(Utils.TENANT, tenantName);
                         String query = body.toString();//"email=" + this.username + "&password=" + this.pwd;
                         Log.e("query", query);
                         OutputStream os = urlConnection.getOutputStream();
@@ -408,8 +433,10 @@ public class SignUpFragment extends Fragment  {
                         out.write(query);
                         out.close();*/
 
-                        this.statusCode = urlConnection.getResponseCode();
+                        //Log.e("55555555555555","55555555555555555555555555555555555555555555555555555555555555");
 
+                        this.statusCode = urlConnection.getResponseCode();
+                        //Log.e("66666666666666666","6666666666666666666666666666666666666666666666666666666666666");
                         Log.e("statusCode", "4: " + statusCode);
 
                         //InputStream in = urlConnection.getInputStream();
@@ -422,7 +449,6 @@ public class SignUpFragment extends Fragment  {
                             while ((line = br.readLine()) != null) {
                                 sb.append(line);
                             }
-
                         } catch (IOException e) {
                             return e.getMessage();
                         } finally {
@@ -436,21 +462,16 @@ public class SignUpFragment extends Fragment  {
                             }
                         }
                         in.close();
-                        //os.close();
                         resultat = sb.toString();
-                    /*}else if (statusCode == 401){
-
-                    }*/
                     }
-
-
 
                 } catch (IOException e) {
                     //Log.e("Exception2", "2: " + e.getMessage());
                     JSONObject jsonObject = new JSONObject();
                     try {
+                        e.printStackTrace();
                         jsonObject.put("error", "invalid_credentials");
-                        jsonObject.put("message", "The user credentials were incorrect");
+                        jsonObject.put("message", "The user credentials were incorrect     " + e.getMessage() + "\n\n" + e.getCause() + "\n\n");
                         return jsonObject.toString();
                     } catch (JSONException e1) {
                         //e1.printStackTrace();
@@ -481,21 +502,22 @@ public class SignUpFragment extends Fragment  {
                 dialog.setVisibility(View.GONE);
             }
 
-            TextView textView = view.findViewById(R.id.resultgetaccesstoken);
+            Log.e("result", result);
+            TextView result_signup = view.findViewById(R.id.result_signup);
             try {
                 JSONObject returnedResult = new JSONObject(result);
                 if (returnedResult.has("success") && returnedResult.getInt("success") == 1 && returnedResult.has("faillure") && returnedResult.getInt("faillure") == 0){
-
-                    Log.e("Success signup", "OKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
-
+                    result_signup.setTextColor(Color.GREEN);
+                    result_signup.setText(returnedResult.getString(Utils.RESPONSE));
                 }else {
-                    textView.setText(returnedResult.getString("raison"));
+                    result_signup.setTextColor(Color.RED);
+                    result_signup.setText(returnedResult.getString(Utils.RAISON));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            Log.e("result", result);
+
         }
     }
 }

@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,6 +36,7 @@ import java.util.UUID;
 import cm.softinovplus.mobilebiller.adapter.MyBluetoothAdapter;
 import cm.softinovplus.mobilebiller.db.SMSDataSource;
 import cm.softinovplus.mobilebiller.sms.SMS;
+import cm.softinovplus.mobilebiller.utils.CustomToast;
 import cm.softinovplus.mobilebiller.utils.TraiteImage;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
@@ -93,6 +95,41 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
             listeView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    SharedPreferences sharedPreferences_access_service = getSharedPreferences(Utils.APP_SERVICE_ACCESS, MODE_PRIVATE);
+
+                    boolean serviceValidity = false;
+                    boolean serviceFound = false;
+
+                    try {
+                        String accesses = sharedPreferences_access_service.getString(Utils.SERVICE_ACCESS,"");
+                        Log.e("ACCESSES", accesses);
+                        JSONArray jsonArray = new JSONArray(accesses);
+
+                        for (int i= 0; i<jsonArray.length(); i++){
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            if (jsonObject.getString(Utils.serviceid).equals(Utils.PRINT_SERVICE_ID)){
+                                long startdate = jsonObject.getLong("startdate");
+                                long enddate   = jsonObject.getLong("enddate");
+                                long currentdate = jsonObject.getLong("currentdate");
+                                if (startdate <= currentdate && currentdate <= enddate){
+                                    serviceValidity = true;
+                                }
+                                serviceFound = true;
+                                break;
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        Toast.makeText(getApplicationContext(), "Not Authorized", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    if (!serviceFound || !serviceValidity){
+                        Toast.makeText(getApplicationContext(), "Not Authorized", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
                     ProgressBar progressBar = view.findViewById(R.id.print_loader);
                     MyAsyncTask mat = new MyAsyncTask(thisActivity,(BluetoothDevice)G_devices.toArray()[position], sms, progressBar);
                     mat.execute("");
@@ -122,7 +159,6 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
             this.context = context;
             mmDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(bt_device_.getAddress());
             this.sms = sms;
-            this.sms.setTenant("Mobile Biller");
             this.dialog = dialog;
             tous_les_donnee = new ArrayList<Byte>();
         }

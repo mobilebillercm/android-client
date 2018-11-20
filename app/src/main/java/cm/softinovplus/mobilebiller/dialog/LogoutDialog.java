@@ -64,7 +64,9 @@ public class LogoutDialog extends DialogFragment {
             public void onClick(View v) {
                 this_delete_dialog.dismiss();
                 SharedPreferences authPreferences = getActivity().getSharedPreferences(Utils.APP_AUTHENTICATION, Context.MODE_PRIVATE);
-                doLogout.execute("http://idea-cm.club/soweda/id/public/api/lougout-user/" + authPreferences.getString(Utils.EMAIL,""));            }
+                doLogout.execute(Utils.HOST_IDENTITY_AND_ACCESS + "api/lougout-user/" + authPreferences.getString(Utils.EMAIL,"") + "/" + authPreferences.getString(Utils.TENANT_ID,""));
+
+            }
         });
         return fragment_dialog;
     }

@@ -6,14 +6,14 @@ public class SMS {
 	private String transaction_type, transaction_beneficiary_name, transaction_beneficiary_account_number,
 			transaction_date, transaction_id, transaction_reference, transaction_state,
 			transaction_currency, transaction_made_by, sms_sender, sms_date, sms_body, sms_receiver, belongs_to, tenant;
-	private int transaction_amount, transaction_balance, is_yet_printed, transaction_fees;
+	private int transaction_amount, transaction_balance, is_yet_printed, transaction_fees, is_online_saved;
 	public SMS(){}
 
 	public SMS(long id, String transaction_type, int transaction_amount, String transaction_beneficiary_name,
 			   String transaction_beneficiary_account_number, String transaction_date, String transaction_id,
 			   String transaction_reference, int transaction_fees, String transaction_state, int transaction_balance,
 			   String transaction_currency, String transaction_made_by, String sms_sender, String sms_date, String sms_body, String sms_receiver, String belongs_to, String tenant,
-			   long received_at, int is_yet_printed) {
+			   long received_at, int is_yet_printed, int is_online_saved) {
 		this.id = id;
 		this.received_at = received_at;
 		this.transaction_type = transaction_type;
@@ -35,6 +35,7 @@ public class SMS {
 		this.transaction_amount = transaction_amount;
 		this.transaction_balance = transaction_balance;
 		this.is_yet_printed = is_yet_printed;
+		this.is_online_saved = is_online_saved;
 	}
 
 	public long getId() {
@@ -203,6 +204,14 @@ public class SMS {
 
 	public void setTransaction_made_by(String transaction_made_by) {
 		this.transaction_made_by = transaction_made_by;
+	}
+
+	public int getIs_online_saved() {
+		return is_online_saved;
+	}
+
+	public void setIs_online_saved(int is_online_saved) {
+		this.is_online_saved = is_online_saved;
 	}
 
 	@Override

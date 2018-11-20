@@ -25,9 +25,8 @@ public class Utils {
 
     public static final String TAG_BOOT_BROADCAST_RECEIVER = "BOOT_BROADCAST_RECEIVER";
     public static final String TAG_BOOT_EXECUTE_SERVICE = "BOOT_BROADCAST_SERVICE";
+    public static final String REMOTE_REGULAREXPRESSION = "remote_regular_expression";
 
-    public static final String INIT = "INIT";
-    public static final String DEFAULT_MAC_ADDRESS = "default_mac_address_bluetooth_device";
 
     public static int NOTIFICATION_ID = 1;
     public static final String NAME = "name";
@@ -45,19 +44,21 @@ public class Utils {
     public static final String sms_id = "sms_id";
     public static final String data = "data";
 
-    public static final String KEYWORDPATTERN = "keywordpattern";
-    public static final String TRANSACTIONTYPE = "transactiontype";
-    public static final String REGULAREXPRESSION = "regularexpression";
+    public static final String HOST_IDENTITY_AND_ACCESS          = "http://212.237.7.253/mobilebiller/ide/public/";
+    public static final String KEYWORDPATTERN                    = "keywordpattern";
+    public static final String TRANSACTIONTYPE                   = "transactiontype";
+    public static final String REGULAREXPRESSION                 = "regularexpression";
 
-    public static SMS TEST_SMS;
-
+    public static final String PROTOCOL_HOST_PORT                = "";
     public static final String USERID                            = "userid";
     public static final String FIRSTNAME                         = "firstname";
     public static final String LASTNAME                          = "lastname";
     public static final String EMAIL                             = "email";
     public static  final String USERNAME                         = "username";
     public static final String TENANT                            = "tenant";
+    public static final String TENANT_ID                         = "tenantid";
     public static final String TENANT_NAME                       = "tenant_name";
+    public static final String TENANT_DESCRIPTION                = "tenant_description";
     public static final String PARENT                            = "parent";
     public static  final String PASSWORD                         = "password";
     public static final String ROLES                             = "roles";
@@ -65,7 +66,9 @@ public class Utils {
     public static final String MOBILEBILLERACCOUNT               = "mobilebillercreditaccount";
     public static final String APP_AUTHENTICATION                = "APP_AUTHENTICATION";
     public static final String APP_CONFIGURAION                  = "APP_CONFIGURAION";
-    public static final String APP_OTHER_CONFIGURAION            = "APP_CONFIGURAION";
+    public static final String APP_OTHER_CONFIGURAION            = "APP_OTHER_CONFIGURAION";
+    public static final String APP_SERVICE_ACCESS                 = "APP_SERVICE_ACCESS";
+
     public static final String BROADCAST_RECEIVER_REGISTERED     = "BROADCAST_RECEIVER_REGISTERED";
     public static final String NOTIFICATION_CHANEL_ID            = "4289EE2E-B99C-11E8-B7C2-AC2B6EE888A2";
     public static final String OK                                = "ok";
@@ -82,6 +85,51 @@ public class Utils {
     public static final String PRIVACY_POLICY_ACCEPTED           = "accepted";
     public static final String MOBILEBILLER_PRIVACY_POLICY       = "http://idea-cm.club/regles-pridesoft-mobile.html";
     public static final String LAST_SMS_ID                       = "last_sms_id";
+    public static final String INIT                              = "INIT";
+    public static final String DEFAULT_MAC_ADDRESS               = "default_mac_address_bluetooth_device";
+    public static final String RESPONSE                          = "response";
+    public static final String TENANTID                          = "tenantid";
+    public static final String TICKET_END_POINT                  = "http://212.237.7.253/mobilebiller/rec/public/api/receipts-android";
+    public static final String TICKET_ACCESS_TOKEN               = "ticket_access_token";
+    public static final int TICKET_CLIENT_ID                     = 2;
+    public static final String TICKET_CLIENT_SECRET              = "rjvYRlBhvsj8LDibO5Lf975OPp3kGbF5a6bzEEOe";
+    public static final String TICKET_GRANT_TYPE                 = "client_credentials";
+    public static final String TICKET_ACCESS_TOKEN_END_POINT     = "http://212.237.7.253/mobilebiller/rec/public/oauth/token";
+    public static final String ROOT_URL_LOGIN                    = "http://212.237.7.253/mobilebiller/ide/public/api/users/";
+    public static final String LOGIN_ACCESS_TOKEN_URL            = HOST_IDENTITY_AND_ACCESS + "api/access-token";
+    public static final String ROOT_URL_USER_TENANTS             = "http://212.237.7.253/mobilebiller/web/public/api/tenants/";
+    public static final int CLIENT_ID                            = 3;
+    public static final String CLIENT_SECRET                     = "va2vv9Q2Ps57W3xiUPSEMGOpFcOx64RP9mGwYx5A";
+    public static final String PASSWORD_GRANT_TYPE               = "password";
+    public static final String SIGNUP_URL                        = "http://212.237.7.253/mobilebiller/ide/public/api/tenants-provisions";
+    public static final String RAISON                            = "raison";
+    public static final int WALLET_CLIENT_ID                     = 1;
+    public static final String WALLET_CLIENT_SECRET              = "nxei6UNWAjW7oYV9DXWLVd18VTP9yfJmUC1usaxI";
+    public static final String WALLET_GRANT_TYPE                 = "client_credentials";
+    public static final String WALLET_ACCESS_TOKEN_END_POINT     = "http://212.237.7.253/mobilebiller/wal/public/oauth/token";
+    public static final String WALLET_ACCESS_TOKEN               = "wallet_access_token";
+    public static final String HOST_WALLET                       = "http://212.237.7.253/mobilebiller/wal/public/";
+
+    public static final int CLIENT_CLIENT_ID                     = 4;
+    public static final String CLIENT_CLIENT_SECRET              = "uWsbWpN82H01Ido7yMPhsYPH9vdZ5cHoA4pXaY97";
+    public static final String CLIENT_GRANT_TYPE                 = "client_credentials";
+    public static final String CLIENT_ACCESS_TOKEN_END_POINT     = "http://212.237.7.253/mobilebiller/web/public/oauth/token";
+    public static final String CLIENT_ACCESS_TOKEN               = "client_access_token";
+    public static final String HOST_CLIENT                       = "http://212.237.7.253/mobilebiller/web/public/";
+    public static final String DEFAULT_TENANT_ID                 = "";
+    public static final String DEFAULT_TENANT_NAME               = "MOBILE BILLER";
+    public static final String HOST_SERVICE_ACCESS               = "http://212.237.7.253/mobilebiller/sea/public/";
+    public static final String SERVICE_ACCESS                    = "SERVICE_ACCESS";
+    public static final String PRINT_SERVICE_ID                  = "61e857c0-cecd-11e8-bdce-49267d475577";
+    public static final String serviceid                         = "serviceid";
+
+
+
+
+    public static final String SCOPE_MANAGE_IDENTITIES_AND_ACCESSES = "SCOPE_MANAGE_IDENTITIES_AND_ACCESSES";
+
+
+
 
     //public static final String ACCESS_TOKEN_EXPIRY_DATE          = "ACCESS_TOKEN_EXPIRY_DATE";
 
@@ -94,17 +142,7 @@ public class Utils {
     ///
     ///////////////////////////////////////////
 
-    public static final String GEOLOCATION_ACTIVITY_LIST_URL = "http://idea-cm.club/soweda/geo/public/api/activities";
-    public static final String GEOLOCATION_AGRICULTURAL_PRODUCTION_AREA_LIST_URL = "http://idea-cm.club/soweda/geo/public/api/geolocation-agriculturalproductionareas";
 
-    public static final String GEOLOCATION_GEOLOCATE_ACTIVITY_ROOT_URL = "http://idea-cm.club/soweda/geo/public/api/geolocation-activities/";
-    public static final String GEOLOCATION_GEOLOCATE_AGRICULTURAL_PRODUCTION_AREA_ROOT_URL = "http://idea-cm.club/soweda/geo/public/api/agriculturalproductionareas/";
-    public static final String ACCESS_TOKEN_URL = "http://idea-cm.club/soweda/id/public/api/access-token";
-    public static final int CLIENT_ID = 7;
-    public static final String CLIENT_SECRET = "POoLGZSUGYoq3Zw6rsIo7j7CweDLLLoOhcpbDzwI";
-    public static final String GRANT_TYPE = "password";
-    public static final String EXPRESSION_REGULIERE_PAIEMENT_FRAIS_SCOLARITE =
-            "Paiement reussi de (\\w+)(\\s+\\w+)*\\s+(LYCEE|CES|CETIC|CETIF)\\s+(\\w+\\s+)*(DE|D')";
 
     //3- Paiement reussi de FOWA JOSEPH LYCEE TECHNIQUE DE NYLON-1er cycle Date 06/09/2018 12:11:22 Montant 10000 XAF Pay ID 12623. Votre Pay ID est votre preuve de paiement.
     //7- Paiement reussi de TAFOUNG CABREL LYCEE TECHNIQUE de NYLON - 2nd cycle Date 06/09/2018 11:24:47 Montant 15000 XAF Pay ID 12367. Votre Pay ID est votre preuve de paiement.
@@ -113,7 +151,11 @@ public class Utils {
 
     public static String makeDateDate(long when){
         Date date = new Date(when);
-        return (new SimpleDateFormat("yy-MM-dd HH:mm:ss", Locale.ITALIAN)).format(date);
+        return (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)).format(date);
+    }
+
+    public static String makeUrlUserTenants(String username){
+        return ROOT_URL_USER_TENANTS + username;
     }
 
     public static JSONArray keysPatterns(){
@@ -188,5 +230,20 @@ public class Utils {
         return  jsonArray;
     }
 
-
+    public static String makeUrlLogin(String username){
+        return ROOT_URL_LOGIN + username + "/login";
+    }
+    public static String makeTenantLogoUrl(String tenantid) {
+        return HOST_IDENTITY_AND_ACCESS + "api/tenants/" + tenantid + "/logo";
+    }
 }
+
+
+/*
+[{"id":11,"serviceid":"61e857c0-cecd-11e8-bdce-49267d475577","clientid":"e40394e0-d0a3-11e8-a37e-6b2692fae9e0",
+"tenantid":"57261bf0-d0a1-11e8-bd1f-47fec029a2ff","startdate":1539863364,"enddate":1547639364,"enablementstatus":1,"expirationstatus":0,
+"reasonenablementchanged":null,"created_at":"2018-10-18 11:49:24","updated_at":"2018-10-18 11:51:30"},
+{"id":12,"serviceid":"f4adac70-ce2b-11e8-99bc-1b0e3dd244de","clientid":"e40394e0-d0a3-11e8-a37e-6b2692fae9e0",
+"tenantid":"57261bf0-d0a1-11e8-bd1f-47fec029a2ff","startdate":1539863646,"enddate":1547639646,"enablementstatus":1,"expirationstatus":0,
+"reasonenablementchanged":null,"created_at":"2018-10-18 11:54:06","updated_at":"2018-10-18 11:54:06"}]}
+ */

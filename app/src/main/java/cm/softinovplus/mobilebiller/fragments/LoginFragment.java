@@ -55,6 +55,7 @@ import cm.softinovplus.mobilebiller.Authenticated;
 import cm.softinovplus.mobilebiller.PrintNewSMS;
 import cm.softinovplus.mobilebiller.R;
 import cm.softinovplus.mobilebiller.utils.CustomToast;
+import cm.softinovplus.mobilebiller.utils.Tenant;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -66,15 +67,17 @@ public class LoginFragment extends Fragment implements OnClickListener {
 
     private EditText emailid, password;
     private Button loginButton;
-    private TextView forgotPassword, signUp;
+    private TextView forgotPassword, signUp, text_config_loader;
     private CheckBox show_hide_password;
     private String tenantName;
+    private String tenantId;
     private AppCompatSpinner spinner_tenant;
     private LinearLayout tenant_layout;
-    private List<String> tenants;
+    private List<Tenant> tenants;
     private ArrayAdapter<String> arrayAdapter;
     private static Animation shakeAnimation;
     private static FragmentManager fragmentManager;
+    private  ProgressBar progressbar_config_regex;
 
     public LoginFragment() {
 
@@ -83,10 +86,19 @@ public class LoginFragment extends Fragment implements OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.login_layout, container, false);
+
+        text_config_loader = view.findViewById(R.id.text_config_loader);
+        progressbar_config_regex = view.findViewById(R.id.progressbar_config_regex);
+
+        LoadConfigurationSmsRegex loadConfigurationSmsRegex = new LoadConfigurationSmsRegex(getActivity(), progressbar_config_regex, text_config_loader);
+        loadConfigurationSmsRegex.execute("http://mobilebiller.idea-cm.club/sms_regular_expressions");
+
         initViews();
         setListeners();
         return view;
     }
+
+
 
     // Initiate Views
     private void initViews() {
@@ -158,23 +170,26 @@ public class LoginFragment extends Fragment implements OnClickListener {
                 if (!hasFocus){
                     String getEmailId = ((EditText)v).getText().toString().trim();
                     // Check patter for email id
-                    Pattern p = Pattern.compile(Utils.REGEX_EMAIL);
+                    if (getEmailId.length() > 0){
+                        Pattern p = Pattern.compile(Utils.REGEX_EMAIL);
 
-                    Matcher m = p.matcher(getEmailId);
-                    if (!m.matches()) {
-                        new CustomToast().Show_Toast(getActivity(), view, "Your Email Id is Invalid.");
-                    }else{
-                        Toast.makeText(getActivity(), "Getting Tenant", Toast.LENGTH_LONG).show();
-                        ProgressBar progressBarGetTenant = view.findViewById(R.id.progressBarGetTenant);
-                        GetTenant getTenant = new GetTenant(getActivity(), progressBarGetTenant, getEmailId);
-                        getTenant.execute("http://idea-cm.club/tenants.php");
+                        Matcher m = p.matcher(getEmailId);
+                        if (!m.matches()) {
+                            new CustomToast().Show_Toast(getActivity(), view, "Your Email Id is Invalid.");
+                        }else{
+                            Toast.makeText(getActivity(), "Getting Tenant", Toast.LENGTH_LONG).show();
+                            ProgressBar progressBarGetTenant = view.findViewById(R.id.progressBarGetTenant);
+                            GetTenant getTenant = new GetTenant(getActivity(), progressBarGetTenant);
+                            getTenant.execute(Utils.makeUrlUserTenants(emailid.getText().toString()));
+                        }
                     }
+
                 }
 
             }
         });
 
-        checkIfConnected();
+        //checkIfConnected();
 
     }
 
@@ -191,13 +206,12 @@ public class LoginFragment extends Fragment implements OnClickListener {
                 && pref_access_token != null && !(pref_expires_in == -1) && pref_refresh_token != null){
             ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.login_progrees_bar);
             progressBar.setVisibility(View.GONE);
-            GetAccessToken getAccessToken = new GetAccessToken(getActivity(), progressBar,  Utils.CLIENT_ID, Utils.CLIENT_SECRET, Utils.GRANT_TYPE,
-                    pref_email, pref_passowrd);
-            getAccessToken.execute(Utils.ACCESS_TOKEN_URL);
+            BeginLogin beginLogin = new BeginLogin(getActivity(), progressBar,  Utils.CLIENT_ID, Utils.CLIENT_SECRET, Utils.PASSWORD_GRANT_TYPE,
+                    preferences.getString(Utils.TENANT_ID,""), pref_email, pref_passowrd);
+            beginLogin.execute(Utils.LOGIN_ACCESS_TOKEN_URL);
         }
 
     }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -247,30 +261,32 @@ public class LoginFragment extends Fragment implements OnClickListener {
             ProgressBar progressBar = (ProgressBar) view.findViewById(R.id.login_progrees_bar);
             progressBar.setVisibility(View.GONE);
 
-            GetAccessToken getAccessToken = new GetAccessToken(getActivity(), progressBar, Utils.CLIENT_ID, Utils.CLIENT_SECRET, Utils.GRANT_TYPE,
-                    emailid.getText().toString().trim(), password.getText().toString());
+            BeginLogin beginLogin = new BeginLogin(getActivity(), progressBar, Utils.CLIENT_ID, Utils.CLIENT_SECRET, Utils.PASSWORD_GRANT_TYPE,
+                    tenantId, emailid.getText().toString().trim(), password.getText().toString());
 
-            getAccessToken.execute(Utils.ACCESS_TOKEN_URL);
+            beginLogin.execute(Utils.LOGIN_ACCESS_TOKEN_URL);
         }
 
 
     }
 
-    private class GetAccessToken extends AsyncTask<String, Integer, String> {
+    private class BeginLogin extends AsyncTask<String, Integer, String> {
         private ProgressBar dialog;
         private Context context;
         private int clientId;
         private String clienSecret;
         private String grantType;
+        private String tenantid;
         private String username;
         private String pwd;
         private int statusCode = 0;
 
-        public GetAccessToken(Context context, ProgressBar dialog, int clientId, String clienSecret, String grantType, String username, String password) {
+        public BeginLogin(Context context, ProgressBar dialog, int clientId, String clienSecret, String grantType, String tenantid, String username, String password) {
             this.context = context;
             this.clientId = clientId;
             this.clienSecret = clienSecret;
             this.grantType = grantType;
+            this.tenantid = tenantid;
             this.username = username;
             this.pwd = password;
             this.dialog = dialog;
@@ -297,7 +313,7 @@ public class LoginFragment extends Fragment implements OnClickListener {
                     urlConnection.setDoOutput(true);
                     //urlConnection.setRequestProperty("Content-Type","application/json");
                     String query = "client_id=" + this.clientId + "&client_secret=" + this.clienSecret + "&grant_type=" + this.grantType +
-                            "&username=" + this.username + "&password=" + this.pwd;
+                           "&tenantid=" + this.tenantid +  "&username=" + this.username + "&password=" + this.pwd;
                     Log.e("query", query);
                     OutputStream os = urlConnection.getOutputStream();
                     OutputStreamWriter out = new OutputStreamWriter(os);
@@ -383,8 +399,8 @@ public class LoginFragment extends Fragment implements OnClickListener {
                     textView.setText(jsonObject.getString(Utils.MESSAGE));
                 }else if (jsonObject.has(Utils.ACCESS_TOKEN) && jsonObject.has(Utils.TOKEN_TYPE) && jsonObject.has(Utils.EXPIRES_IN) && jsonObject.getInt(Utils.EXPIRES_IN) > 0
                         && jsonObject.has(Utils.REFRESH_TOKEN) ){
-                    DoLogin doLogin = new DoLogin(this.context, this.dialog, this.username, this.pwd, jsonObject);
-                    doLogin.execute("http://idea-cm.club/soweda/id/public/api/users/" + this.username + "/login");
+                    DoLogin doLogin = new DoLogin(this.context, this.dialog, this.tenantid, this.username, this.pwd, jsonObject);
+                    doLogin.execute(Utils.makeUrlLogin(this.username));
                 }else{
                     textView.setText("Woop Something went Wrong...");
                 }
@@ -400,14 +416,16 @@ public class LoginFragment extends Fragment implements OnClickListener {
     private class DoLogin extends AsyncTask<String, Integer, String> {
         private ProgressBar dialog;
         private Context context;
+        private String tenantid;
         private String username;
         private String pwd;
         private JSONObject token;
         private int statusCode = 0;
 
-        public DoLogin(Context context, ProgressBar dialog, String username, String password, JSONObject token) {
+        public DoLogin(Context context, ProgressBar dialog, String tenantid, String username, String password, JSONObject token) {
             this.context = context;
             this.dialog = dialog;
+            this.tenantid = tenantid;
             this.username = username;
             this.pwd = password;
             this.token = token;
@@ -435,12 +453,12 @@ public class LoginFragment extends Fragment implements OnClickListener {
                     urlConnection.setDoOutput(true);
                     Log.e("ACCESSTOKEN", this.token.getString(Utils.ACCESS_TOKEN));
                     urlConnection.setRequestProperty (Utils.AUTHORIZATION, Utils.BEARER + " " + this.token.getString(Utils.ACCESS_TOKEN));
-                    urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
-                    JSONObject body = new JSONObject();
+                    //urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
+                    /*JSONObject body = new JSONObject();
                     body.put(Utils.EMAIL, this.username);
                     body.put(Utils.PASSWORD, this.pwd);
-                    body.put(Utils.TENANT, tenantName);
-                    String query = body.toString();//"email=" + this.username + "&password=" + this.pwd;
+                    String query = body.toString();*///"email=" + this.username + "&password=" + this.pwd;
+                    String query =  "tenantid=" + this.tenantid + "&password=" + this.pwd  + "&username=" + this.username ;
                     Log.e("query", query);
                     OutputStream os = urlConnection.getOutputStream();
                     OutputStreamWriter out = new OutputStreamWriter(os);
@@ -524,17 +542,38 @@ public class LoginFragment extends Fragment implements OnClickListener {
                 JSONObject returnedResult = new JSONObject(result);
                 if (returnedResult.has("success") && returnedResult.getInt("success") == 1 && returnedResult.has("faillure") && returnedResult.getInt("faillure") == 0){
 
+
+
+
+                    JSONObject response = returnedResult.getJSONObject(Utils.RESPONSE);
+
                     SharedPreferences.Editor editor = getActivity().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE).edit();
                     editor.putString(Utils.EMAIL, this.username);
+                    editor.putString(Utils.USERNAME, this.username);
+                    editor.putString(Utils.USERID, response.getString(Utils.USERID));
                     editor.putString(Utils.PASSWORD, this.pwd);
                     editor.putString(Utils.TOKEN_TYPE, this.token.getString(Utils.TOKEN_TYPE));
                     editor.putString(Utils.ACCESS_TOKEN, this.token.getString(Utils.ACCESS_TOKEN));
                     editor.putLong(Utils.EXPIRES_IN, this.token.getLong(Utils.EXPIRES_IN) + System.currentTimeMillis());
                     editor.putString(Utils.REFRESH_TOKEN, this.token.getString(Utils.REFRESH_TOKEN));
-                    editor.putString(Utils.TENANT, "MOBILE BILLER");
+
+                    editor.putString(Utils.TENANT_ID, response.getString(Utils.TENANT_ID));
+                    editor.putString(Utils.TENANT_NAME, response.getString(Utils.TENANT_NAME));
+                    editor.putString(Utils.TENANT_DESCRIPTION, response.getString(Utils.TENANT_DESCRIPTION));
+                    editor.putString(Utils.NAME, response.getString(Utils.NAME));
+
                     editor.apply();
 
-                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Utils.APP_OTHER_CONFIGURAION, MODE_PRIVATE);
+
+                    GetServiceValidity getServiceValidity = new GetServiceValidity(getContext(), dialog);
+
+                    getServiceValidity.execute(Utils.HOST_SERVICE_ACCESS + "api/tenant/" + response.getString(Utils.TENANT_ID) +
+                            "/client/" + response.getString(Utils.USERID) + "/services-validities-periods?scope=" + Utils.SCOPE_MANAGE_IDENTITIES_AND_ACCESSES);
+
+/////tenant/{tenantid}/client/{clientid}/services-validities-periods
+
+
+                    /*SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Utils.APP_OTHER_CONFIGURAION, MODE_PRIVATE);
                     if (sharedPreferences.getLong(Utils.LAST_SMS_ID, -1) != -1){
                         startActivity(new Intent(getActivity(), PrintNewSMS.class));
                     }else{
@@ -546,7 +585,7 @@ public class LoginFragment extends Fragment implements OnClickListener {
                         } else {
                             startActivity(intent);
                         }
-                    }
+                    }*/
 
                 }else {
                     textView.setText(returnedResult.getString("raison"));
@@ -562,12 +601,10 @@ public class LoginFragment extends Fragment implements OnClickListener {
     private class GetTenant extends AsyncTask<String, Integer, String> {
         private ProgressBar dialog;
         private Context context;
-        private String email;
         private int statusCode = 0;
 
-        public GetTenant(Context context, ProgressBar dialog, String email) {
+        public GetTenant(Context context, ProgressBar dialog) {
             this.context = context;
-            this.email = email;
             this.dialog = dialog;
         }
 
@@ -580,12 +617,13 @@ public class LoginFragment extends Fragment implements OnClickListener {
         @Override
         protected String doInBackground(String... strings) {
             String resultat = "";
-            String str_url = strings[0] + "?username=" + this.email;
+            String str_url = strings[0];
             URL url = null;
             try {
                 url = new URL(str_url);
                 HttpURLConnection urlConnection;
                 try {
+                    Log.e("TENANT URL", str_url);
                     urlConnection = (HttpURLConnection) url.openConnection();
                     urlConnection.setRequestMethod("GET");
                     urlConnection.setDoInput(true);
@@ -665,29 +703,26 @@ public class LoginFragment extends Fragment implements OnClickListener {
 
             try {
                 JSONObject jsonObject = new JSONObject(result);
-                if (jsonObject.has(Utils.ERROR)){
-                    textView.setText(jsonObject.getString(Utils.MESSAGE));
-                    new CustomToast().Show_Toast(getActivity(), view, jsonObject.getString(Utils.MESSAGE));
-                }else if (jsonObject.has("success") && jsonObject.has("faillure") && jsonObject.getInt("success") == 0 && jsonObject.getInt("faillure") == 1 ){
-                    textView.setText(jsonObject.getString("raison"));
-                    new CustomToast().Show_Toast(getActivity(), view, jsonObject.getString("raison"));
-                }else if (jsonObject.has("success") && jsonObject.has("faillure") && jsonObject.getInt("success") == 1 && jsonObject.getInt("faillure") == 0 ){
+                 if (jsonObject.has("success") && jsonObject.has("faillure") && jsonObject.getInt("success") == 1 && jsonObject.getInt("faillure") == 0 ){
 
 
                     tenants = new ArrayList<>();
+                     ArrayList<String> tenantsName = new ArrayList<String>();
                     JSONArray jsonArray = jsonObject.getJSONArray("response");
 
                     for (int i = 0; i<jsonArray.length(); i++){
-                        tenants.add(jsonArray.getString(i));
+                        tenants.add(new Tenant(jsonArray.getJSONObject(i).getString("tenant"), jsonArray.getJSONObject(i).getString("tenant_name")));
+                        tenantsName.add(jsonArray.getJSONObject(i).getString("tenant_name"));
                     }
 
-                    arrayAdapter = new ArrayAdapter<String>(context, R.layout.custom_simple_spinner_item, tenants);
+                    arrayAdapter = new ArrayAdapter<String>(context, R.layout.custom_simple_spinner_item, tenantsName);
                     arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinner_tenant.setAdapter(arrayAdapter);
                     spinner_tenant.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                           tenantName = tenants.get(position);
+                           tenantName = tenants.get(position).getName();
+                           tenantId = tenants.get(position).getId();
                         }
 
                         @Override
@@ -697,9 +732,10 @@ public class LoginFragment extends Fragment implements OnClickListener {
                     });
 
                     if (tenants.size() > 0){
-                        tenantName = tenants.get(0);
+                        tenantName = tenants.get(0).getName();
+                        tenantId = tenants.get(0).getId();
                     }
-                    Log.e("TENANT NAMEEE", tenantName);
+                    Log.e("TENANT NAMEEE", tenantId + "           " + tenantName);
                     if (tenants.size() > 1){
                         tenant_layout.setVisibility(View.VISIBLE);
                     }else {
@@ -717,4 +753,319 @@ public class LoginFragment extends Fragment implements OnClickListener {
             Log.e("result", result);
         }
     }
+
+    private class LoadConfigurationSmsRegex extends AsyncTask<String, Integer, String> {
+        private ProgressBar dialog;
+        private Context context;
+        private TextView loadMessage;
+        private int statusCode = 0;
+
+        public LoadConfigurationSmsRegex(Context context, ProgressBar dialog, TextView loadMessage) {
+            this.context = context;
+            this.dialog = dialog;
+            this.loadMessage = loadMessage;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.dialog.setVisibility(View.VISIBLE);
+            this.loadMessage.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String resultat = "";
+            String str_url = strings[0];
+            URL url = null;
+            try {
+                url = new URL(str_url);
+                HttpURLConnection urlConnection;
+                try {
+                    Log.e("TENANT URL", str_url);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.setDoInput(true);
+
+                    this.statusCode = urlConnection.getResponseCode();
+
+                    Log.e("statusCode", "4: " + statusCode);
+                    InputStream in = urlConnection.getInputStream();
+                    BufferedReader br = null;
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    long total = 0;
+                    int lenghtOfFile = urlConnection.getContentLength();
+                    try {
+                        br = new BufferedReader(new InputStreamReader(in));
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+
+                            total += line.length();
+                            //if (line.length() > 0){
+                                publishProgress((int)(total*100/lenghtOfFile));
+                            //}
+                        }
+
+                    } catch (IOException e) {
+                        return e.getMessage();
+                    } finally {
+                        if (br != null) {
+                            try {
+                                br.close();
+                            } catch (IOException e) {
+                                Log.e("Exception3", "3: " + e.getMessage());
+                                return e.getMessage();
+                            }
+                        }
+                    }
+                    in.close();
+                    //os.close();
+                    resultat = sb.toString();
+                    /*}else if (statusCode == 401){
+
+                    }*/
+
+                } catch (IOException e) {
+                    //Log.e("Exception2", "2: " + e.getMessage());
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("error", "invalid_credentials");
+                        jsonObject.put("message", "something Went wrong");
+                        return jsonObject.toString();
+                    } catch (JSONException e1) {
+                        //e1.printStackTrace();
+
+                    }
+
+                    return e.getMessage();
+                }
+            } catch (MalformedURLException e) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("error", "Wopp something went wrong");
+                    jsonObject.put("message", "Wopp something went wrong");
+                    return jsonObject.toString();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+                return e.getMessage();
+            }
+
+            return resultat;
+        }
+
+        protected void onProgressUpdate(Integer percentage) {
+            Log.e("Percentage","  " + percentage);
+            this.dialog.setProgress(percentage);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (dialog.getVisibility() == View.VISIBLE) {
+                dialog.setVisibility(View.GONE);
+            }
+
+            if (loadMessage.getVisibility() == View.VISIBLE) {
+                loadMessage.setVisibility(View.GONE);
+            }
+
+            //TextView textView = view.findViewById(R.id.resultgetaccesstoken);
+
+            try {
+                JSONArray jsonArray = new JSONArray(result);
+                SharedPreferences.Editor editor = getActivity().getSharedPreferences(Utils.APP_CONFIGURAION, MODE_PRIVATE).edit();
+                editor.putString(Utils.REMOTE_REGULAREXPRESSION, result);
+                editor.apply();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.e("result", result);
+        }
+    }
+
+
+    private class GetServiceValidity extends AsyncTask<String, Integer, String> {
+        private ProgressBar dialog;
+        private Context context;
+        private int statusCode = 0;
+
+        public GetServiceValidity(Context context, ProgressBar dialog) {
+            this.context    = context;
+            this.dialog     = dialog;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.dialog.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String resultat = "";
+            String str_url = strings[0];
+            URL url = null;
+            try {
+                url = new URL(str_url);
+                HttpURLConnection urlConnection;
+                try {
+                    Log.e("URL", str_url);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.setDoInput(true);
+                    //urlConnection.setDoOutput(true);
+                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                    String access_token = sharedPreferences.getString(Utils.ACCESS_TOKEN, "");
+                    Log.e("ACCESSTOKEN", access_token);
+                    urlConnection.setRequestProperty (Utils.AUTHORIZATION, Utils.BEARER + " " + access_token);
+                    //urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
+                    /*JSONObject body = new JSONObject();
+                    body.put(Utils.EMAIL, this.username);
+                    body.put(Utils.PASSWORD, this.pwd);
+                    String query = body.toString();*///"email=" + this.username + "&password=" + this.pwd;
+
+                    this.statusCode = urlConnection.getResponseCode();
+
+                    Log.e("statusCode", "4: " + statusCode);
+
+                    InputStream in = urlConnection.getInputStream();
+
+                    BufferedReader br = null;
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    try {
+                        br = new BufferedReader(new InputStreamReader(in));
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+
+                    } catch (IOException e) {
+                        return e.getMessage();
+                    } finally {
+                        if (br != null) {
+                            try {
+                                br.close();
+                            } catch (IOException e) {
+                                Log.e("Exception3", "3: " + e.getMessage());
+                                return e.getMessage();
+                            }
+                        }
+                    }
+                    in.close();
+                    //os.close();
+                    resultat = sb.toString();
+                    /*}else if (statusCode == 401){
+
+                    }*/
+
+                } catch (IOException e) {
+                    //Log.e("Exception2", "2: " + e.getMessage());
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("error", "invalid_credentials");
+                        jsonObject.put("message", "The user credentials were incorrect");
+                        return jsonObject.toString();
+                    } catch (JSONException e1) {
+                        //e1.printStackTrace();
+
+                    }
+
+                    return e.getMessage();
+                }
+            } catch (MalformedURLException e) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("error", "Wopp something went wrong");
+                    jsonObject.put("message", "Wopp something went wrong");
+                    return jsonObject.toString();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+                return e.getMessage();
+            }
+
+            return resultat;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (dialog.getVisibility() == View.VISIBLE) {
+                dialog.setVisibility(View.GONE);
+            }
+
+            TextView textView = view.findViewById(R.id.resultgetaccesstoken);
+            try {
+                JSONObject returnedResult = new JSONObject(result);
+                if (returnedResult.has("success") && returnedResult.getInt("success") == 1 && returnedResult.has("faillure") && returnedResult.getInt("faillure") == 0){
+                    SharedPreferences.Editor editor = getActivity().getSharedPreferences(Utils.APP_SERVICE_ACCESS, MODE_PRIVATE).edit();
+                    JSONArray response = returnedResult.getJSONArray(Utils.RESPONSE);
+                    editor.putString(Utils.SERVICE_ACCESS, response.toString());
+                    editor.apply();
+                }
+
+
+                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Utils.APP_OTHER_CONFIGURAION, MODE_PRIVATE);
+                    if (sharedPreferences.getLong(Utils.LAST_SMS_ID, -1) != -1){
+                        startActivity(new Intent(getActivity(), PrintNewSMS.class));
+                    }else{
+                        Intent intent = new Intent(getActivity().getApplicationContext(), Authenticated.class);
+                        // Check if we're running on Android 5.0 or higher
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+                            //startActivity(intent);
+                        } else {
+                            startActivity(intent);
+                        }
+                    }
+
+                //}else {
+                  //  textView.setText(returnedResult.getString("raison"));
+                //}
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.e("result Service access", result);
+        }
+    }
+
 }
+
+/*
+{
+    "success": 1,
+    "faillure": 0,
+    "response": [
+        {
+            "id": 11,
+            "serviceid": "61e857c0-cecd-11e8-bdce-49267d475577",
+            "clientid": "e40394e0-d0a3-11e8-a37e-6b2692fae9e0",
+            "tenantid": "57261bf0-d0a1-11e8-bd1f-47fec029a2ff",
+            "startdate": 1539863364,
+            "enddate": 1547639364,
+            "enablementstatus": 1,
+            "expirationstatus": 0,
+            "reasonenablementchanged": null,
+            "created_at": "2018-10-18 11:49:24",
+            "updated_at": "2018-10-18 11:51:30"
+        },
+        {
+            "id": 12,
+            "serviceid": "f4adac70-ce2b-11e8-99bc-1b0e3dd244de",
+            "clientid": "e40394e0-d0a3-11e8-a37e-6b2692fae9e0",
+            "tenantid": "57261bf0-d0a1-11e8-bd1f-47fec029a2ff",
+            "startdate": 1539863646,
+            "enddate": 1547639646,
+            "enablementstatus": 1,
+            "expirationstatus": 0,
+            "reasonenablementchanged": null,
+            "created_at": "2018-10-18 11:54:06",
+            "updated_at": "2018-10-18 11:54:06"
+        }
+    ]
+}
+ */

@@ -101,8 +101,8 @@
                     android:id="@+id/contenu_titre"
                     android:background="@color/white">
                     <com.pkmmte.view.CircularImageView
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
                         android:id="@+id/logo"
                         app:border="true"
                         app:border_color="@color/mycolor"
@@ -176,7 +176,6 @@
                             android:text="@string/messervices"
                             android:gravity="center"
                             android:textColor="@color/colorPrimary"
-                            android:layout_marginTop="20dp"
                             android:textSize="17sp"
                             android:textStyle="bold"
                             android:id="@+id/messervice"
@@ -184,23 +183,12 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Service 1"
-                                android:textSize="14sp"
-                                />
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Delai: 23/03/2019"
-                                android:textSize="14sp"
-                                />
+                            android:orientation="vertical"
+                            android:id="@+id/listeservices">
+
+
                         </LinearLayout>
-                        <LinearLayout
+                        <!--<LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
@@ -220,7 +208,7 @@
                                 android:textSize="14sp"
                                 android:textStyle="normal"
                                 />
-                        </LinearLayout>
+                        </LinearLayout>-->
 
                     </LinearLayout>
 

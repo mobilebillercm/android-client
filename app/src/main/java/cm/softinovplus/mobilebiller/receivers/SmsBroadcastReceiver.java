@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
@@ -20,23 +22,30 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.SmsMessage;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cm.softinovplus.mobilebiller.PrintNewSMS;
 import cm.softinovplus.mobilebiller.R;
-import cm.softinovplus.mobilebiller.Welcome;
+import cm.softinovplus.mobilebiller.SMSsActivity;
+import cm.softinovplus.mobilebiller.db.MySQLiteHelper;
 import cm.softinovplus.mobilebiller.db.SMSDataSource;
-import cm.softinovplus.mobilebiller.fragments.LoginFragment;
 import cm.softinovplus.mobilebiller.sms.SMS;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
@@ -139,9 +148,11 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             Toast.makeText(context,this.serviceCenterAddress, Toast.LENGTH_LONG).show();
 
 
-            JSONArray jsonArray = Utils.keysPatterns();
-
             boolean booleen = false;
+            JSONArray jsonArray = null;//Utils.keysPatterns();
+            try {
+                jsonArray = new JSONArray(context.getSharedPreferences(Utils.APP_CONFIGURAION,MODE_PRIVATE).getString(Utils.REMOTE_REGULAREXPRESSION,""));
+
             for (int i = 0; i<jsonArray.length(); i++){
                 try {
                     JSONObject jsonObject = (JSONObject)jsonArray.get(i);
@@ -173,7 +184,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                                 transaction_reference = matcher.group(18);
                                 transaction_balance = matcher.group(19) == null?"0":matcher.group(19);
                                 SharedPreferences sharedPreferences = context.getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
-                                transaction_made_by = sharedPreferences.getString(Utils.TENANT,"MOBILE BILLER");
+                                transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                 booleen = true;
                                 Log.e("FOUND", "YES YES YES YES 1");
                             }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Paiement de Frais de Scolarite")){
@@ -237,7 +248,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                                 transaction_reference = matcher.group(3) + matcher.group(4);
                                 transaction_balance = matcher.group(7);
                                 SharedPreferences sharedPreferences = context.getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
-                                transaction_made_by = sharedPreferences.getString(Utils.TENANT,"MOBILE BILLER");
+                                transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                 booleen = true;
                                 Log.e("FOUND", "YES YES YES YES 5");
                             }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Recharge de credit")){
@@ -254,7 +265,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                                 //String aa = (matcher.group(9) == null)?"":matcher.group(9);
                                 transaction_balance = matcher.group(8);
                                 SharedPreferences sharedPreferences = context.getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
-                                transaction_made_by = sharedPreferences.getString(Utils.TENANT,"MOBILE BILLER");
+                                transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                 booleen = true;
                                 Log.e("FOUND", "YES YES YES YES 6");
                             }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Envoi de fond")){
@@ -271,7 +282,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                                 //String aa = (matcher.group(9) == null)?"":matcher.group(9);
                                 transaction_balance = matcher.group(9);
                                 SharedPreferences sharedPreferences = context.getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
-                                transaction_made_by = sharedPreferences.getString(Utils.TENANT,"MOBILE BILLER");
+                                transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                 booleen = true;
                                 Log.e("FOUND", "YES YES YES YES 7");
                             }else{
@@ -297,8 +308,10 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                     e.printStackTrace();
                 }
             }
-
             Log.e("booleen", "" + booleen);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             if (booleen){
                 SMSDataSource smsDatatSource = new SMSDataSource(context);
@@ -311,18 +324,24 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                         Integer.parseInt(this.transaction_amount.replaceAll("[\\-\\+\\.\\^:,]", "")),this.transaction_beneficiary_name,this.transaction_beneficiary_account_number,
                         this.transaction_date, this.transaction_id, this.transaction_reference, Integer.parseInt(this.transaction_fees.replaceAll("[\\-\\+\\.\\^:,]", "")), this.transaction_state,
                         Integer.parseInt(this.transaction_balance.replaceAll("[\\-\\+\\.\\^:,]", "")), this.transaction_currency,this.transaction_made_by ,this.sms_sender,
-                        this.sms_sent_date, this.sms_body, this.sms_receiver,sharedPreferences.getString(Utils.EMAIL,"MOBILE BILLER"),"MOBILE BILLER", System.currentTimeMillis(), 0);
+                        this.sms_sent_date, this.sms_body, this.sms_receiver,sharedPreferences.getString(Utils.TENANT_ID, Utils.DEFAULT_TENANT_ID),
+                        sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME), System.currentTimeMillis(), 0, 0);
 
-                //for Test
-                //Utils.TEST_SMS = sms;
                 SharedPreferences.Editor editor = context.getSharedPreferences(Utils.APP_CONFIGURAION, MODE_PRIVATE).edit();
                 editor.putLong(Utils.LAST_SMS_ID, sms.getId());
                 editor.apply();
 
                 smsDatatSource.close();
 
-                // Create the NotificationChannel, but only on API 26+ because
-                // the NotificationChannel class is new and not in the support library
+                if (SMSsActivity.thisActivity != null){
+                    SMSsActivity.refreshList();
+                }
+
+                String ticketAccessToken = sharedPreferences.getString(Utils.TICKET_ACCESS_TOKEN,"OK");
+
+                    BeginSaveReceipt beginSaveReceipt = new BeginSaveReceipt(context, sms, Utils.TICKET_CLIENT_ID, Utils.TICKET_CLIENT_SECRET, Utils.TICKET_GRANT_TYPE);
+                    beginSaveReceipt.execute(Utils.TICKET_ACCESS_TOKEN_END_POINT);
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     CharSequence name = context.getString(R.string.channel_name);
                     String description = context.getString(R.string.channel_description);
@@ -334,7 +353,6 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                     NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
                     notificationManager.createNotificationChannel(channel);
                 }
-
 
                 CharSequence bigTitle = context.getResources().getString(R.string.app_name);
             /*NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
@@ -396,7 +414,6 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 notification.flags = Notification.FLAG_AUTO_CANCEL;
 
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-
                 // notificationId is a unique int for each notification that you must define
                 notificationManager.notify(Utils.NOTIFICATION_ID ++, notification);
             }
@@ -428,6 +445,286 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
 
             //}
+        }
+    }
+
+
+    private class DoSaveTicket extends AsyncTask<String, Integer, String> {
+        private Context context;
+        private String access_token;
+        private SMS smsToSend;
+        private int statusCode = 0;
+
+        public DoSaveTicket(Context context, SMS smsToSend, String token) {
+            this.context = context;
+            this.smsToSend = smsToSend;
+            this.access_token = token;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String resultat = "";
+            String str_url = strings[0];
+            URL url = null;
+            try {
+                url = new URL(str_url);
+                HttpURLConnection urlConnection;
+                try {
+                    Log.e("URL", str_url);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setDoInput(true);
+                    urlConnection.setDoOutput(true);
+                    Log.e("ACCESSTOKEN", this.access_token);
+                    urlConnection.setRequestProperty (Utils.AUTHORIZATION, Utils.BEARER + " " + this.access_token);
+                    urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
+
+                    JSONObject body = new JSONObject();
+
+                    SharedPreferences preferences = this.context.getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+
+                    body.put(Utils.USERID, preferences.getString(Utils.USERID, "mobilebiller"));
+                    body.put(Utils.TENANTID, preferences.getString(Utils.TENANTID, "mobilebiller"));
+                    body.put("transactionid", smsToSend.getTransaction_id());
+                    body.put("amount", smsToSend.getTransaction_amount());
+                    body.put("address", smsToSend.getSms_sender());
+                    /*String transactionDate = smsToSend.getTransaction_date().replace('/', '-');
+                    String vet [] = transactionDate.split("\\w+");
+                    String vett [] = vet[0].split("\\-");*/
+                    body.put("date", smsToSend.getTransaction_date());
+                    body.put("body", smsToSend.getSms_body());
+                    String dateSent = smsToSend.getSms_date().replace('/', '-');
+                    /*String vet1 [] = dateSent.split("\\w+");
+                    String vett2 [] = vet1[0].split("\\-");*/
+                    body.put("date_sent", smsToSend.getSms_date());
+                    body.put("current_balance", smsToSend.getTransaction_balance());
+                    body.put("available_balance", -1);
+                    body.put("beneficiary", smsToSend.getTransaction_beneficiary_name());
+                    body.put("type", smsToSend.getTransaction_type());
+                    body.put("verification_code", smsToSend.getTenant());
+                    body.put("made_by", smsToSend.getTransaction_made_by());
+                    body.put("currency", smsToSend.getTransaction_currency());
+                    String query = body.toString();//"email=" + this.username + "&password=" + this.pwd;
+                    Log.e("query", query);
+                    OutputStream os = urlConnection.getOutputStream();
+                    OutputStreamWriter out = new OutputStreamWriter(os);
+                    out.write(query);
+                    out.close();
+
+                    this.statusCode = urlConnection.getResponseCode();
+
+                    Log.e("statusCode", "4: " + statusCode);
+
+                    InputStream in = urlConnection.getInputStream();
+
+                    BufferedReader br = null;
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    try {
+                        br = new BufferedReader(new InputStreamReader(in));
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+                    } catch (IOException e) {
+                        return e.getMessage();
+                    } finally {
+                        if (br != null) {
+                            try {
+                                br.close();
+                            } catch (IOException e) {
+                                Log.e("Exception3", "3: " + e.getMessage());
+                                return e.getMessage();
+                            }
+                        }
+                    }
+                    in.close();
+                    resultat = sb.toString();
+                } catch (IOException e) {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("error", "invalid_credentials");
+                        jsonObject.put("message", "The user credentials were incorrect");
+                        return jsonObject.toString();
+                    } catch (JSONException e1) {
+                    }
+                    return e.getMessage();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } catch (MalformedURLException e) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("error", "Wopp something went wrong");
+                    jsonObject.put("message", "Wopp something went wrong");
+                    return jsonObject.toString();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+                return e.getMessage();
+            }
+
+            return resultat;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            try {
+                JSONObject returnedResult = new JSONObject(result);
+                if (returnedResult.has("success") && returnedResult.getInt("success") == 1 && returnedResult.has("faillure") && returnedResult.getInt("faillure") == 0){
+
+                    SMSDataSource smsDatatSource = new SMSDataSource(context);
+                    smsDatatSource.open();
+                    smsToSend.setIs_online_saved(1);
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(MySQLiteHelper.COLUMN_IS_ONLINE_SAVED, 1);
+                    smsDatatSource.updateSMS(smsToSend.getId(), contentValues);
+                    smsDatatSource.close();
+                }else {
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.e("result Return Result", result);
+        }
+    }
+
+
+    private class BeginSaveReceipt extends AsyncTask<String, Integer, String> {
+        private int clientId;
+        private String clienSecret;
+        private String grantType;
+        private Context context;
+        private SMS sms;
+        private int statusCode = 0;
+
+        public BeginSaveReceipt(Context context, SMS smsToSend, int clientId, String clienSecret, String grantType) {
+            this.context = context;
+            this.sms = smsToSend;
+            this.clientId = clientId;
+            this.clienSecret = clienSecret;
+            this.grantType = grantType;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String resultat = "";
+            String str_url = strings[0];
+            URL url = null;
+            try {
+                url = new URL(str_url);
+                HttpURLConnection urlConnection;
+                try {
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setDoInput(true);
+                    urlConnection.setDoOutput(true);
+                    String query = "client_id=" + this.clientId + "&client_secret=" + this.clienSecret + "&grant_type=" + this.grantType ;
+                    Log.e("query", query);
+                    OutputStream os = urlConnection.getOutputStream();
+                    OutputStreamWriter out = new OutputStreamWriter(os);
+                    out.write(query);
+                    out.close();
+
+
+
+                    this.statusCode = urlConnection.getResponseCode();
+
+                    Log.e("statusCode", "4: " + statusCode);
+
+                    //if (statusCode ==  200) {
+                    InputStream in = urlConnection.getInputStream();
+
+                    BufferedReader br = null;
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    try {
+                        br = new BufferedReader(new InputStreamReader(in));
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+
+                    } catch (IOException e) {
+                        return e.getMessage();
+                    } finally {
+                        if (br != null) {
+                            try {
+                                br.close();
+                            } catch (IOException e) {
+                                Log.e("Exception3", "3: " + e.getMessage());
+                                return e.getMessage();
+                            }
+                        }
+                    }
+                    in.close();
+                    //os.close();
+                    resultat = sb.toString();
+                    /*}else if (statusCode == 401){
+
+                    }*/
+
+                } catch (IOException e) {
+                    //Log.e("Exception2", "2: " + e.getMessage());
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("error", "invalid_credentials");
+                        jsonObject.put("message", "The user credentials were incorrect");
+                        return jsonObject.toString();
+                    } catch (JSONException e1) {
+                        //e1.printStackTrace();
+
+                    }
+
+                    return e.getMessage();
+                }
+            } catch (MalformedURLException e) {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("error", "Wopp something went wrong");
+                    jsonObject.put("message", "Wopp something went wrong");
+                    return jsonObject.toString();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+                return e.getMessage();
+            }
+
+            return resultat;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                if (jsonObject.has(Utils.ERROR)){
+                }else if (jsonObject.has(Utils.ACCESS_TOKEN) && jsonObject.has(Utils.TOKEN_TYPE) && jsonObject.has(Utils.EXPIRES_IN) && jsonObject.getInt(Utils.EXPIRES_IN) > 0){
+                    SharedPreferences.Editor editor = context.getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE).edit();
+                    editor.putString(Utils.TICKET_ACCESS_TOKEN, jsonObject.getString(Utils.ACCESS_TOKEN));
+                    editor.apply();
+                    DoSaveTicket doSaveTicket =  new DoSaveTicket(this.context,this.sms, jsonObject.getString(Utils.ACCESS_TOKEN));
+                    doSaveTicket.execute(Utils.TICKET_END_POINT);
+                }else{
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.e("access_token", result);
         }
     }
 

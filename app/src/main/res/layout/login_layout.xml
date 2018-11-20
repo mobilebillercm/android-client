@@ -64,6 +64,31 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+            <ProgressBar
+                android:id="@+id/progressbar_config_regex"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:max="100"
+                android:progress="0"
+                android:backgroundTint="@color/white"
+                android:indeterminateTint="@color/mycolor"
+                android:layout_marginTop="7dp"
+                android:visibility="gone"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/mycolor"
+                android:text="@string/chargement_configuration"
+                android:layout_below="@+id/progressbar_config_regex"
+                android:id="@+id/text_config_loader"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:visibility="gone"
+                />
 
             <TextView
                 android:layout_width="match_parent"
@@ -76,6 +101,7 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:id="@+id/titre"
+                android:layout_below="@+id/text_config_loader"
                 />
 
             <TextView

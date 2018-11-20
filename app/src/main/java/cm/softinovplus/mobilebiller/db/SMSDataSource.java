@@ -40,7 +40,8 @@ public class SMSDataSource {
 			  MySQLiteHelper.COLUMN_BELONGS_TO,
 			  MySQLiteHelper.COLUMN_TENANT,
 			  MySQLiteHelper.COLUMN_RECEIVED_AT,
-			  MySQLiteHelper.COLUMN_IS_YET_PRINTED
+			  MySQLiteHelper.COLUMN_IS_YET_PRINTED,
+			  MySQLiteHelper.COLUMN_IS_ONLINE_SAVED
 
 	  };
 	  
@@ -61,7 +62,7 @@ public class SMSDataSource {
 						   String transaction_beneficiary_account_number, String transaction_date, String transaction_id,
 						   String transaction_reference, int transaction_fees, String transaction_state, int transaction_balance,
 						   String transaction_currency, String transaction_made_by, String sms_sender, String sms_date, String sms_body, String sms_receiver, String belongs_to, String tenant,
-						   long received_at, int is_yet_printed) {
+						   long received_at, int is_yet_printed, int is_online_saved) {
 	    ContentValues values = new ContentValues();
 	    values.put(MySQLiteHelper.COLUMN_ID, id);
 	    values.put(MySQLiteHelper.COLUMN_TRANSACTION_TYPE, transaction_type);
@@ -84,6 +85,7 @@ public class SMSDataSource {
 		  values.put(MySQLiteHelper.COLUMN_TENANT, tenant);
 		  values.put(MySQLiteHelper.COLUMN_RECEIVED_AT, received_at);
 		  values.put(MySQLiteHelper.COLUMN_IS_YET_PRINTED, is_yet_printed);
+		  values.put(MySQLiteHelper.COLUMN_IS_ONLINE_SAVED, is_online_saved);
 		  Log.e("Start Save SMS", sms_body);
 
           Cursor cursore = database.query(MySQLiteHelper.TABLE_SMS, allColumns, "1" , null, null, null, MySQLiteHelper.COLUMN_ID + " ");
@@ -168,9 +170,8 @@ public class SMSDataSource {
 		  sms.setTenant(cursor.getString(18));
 		  sms.setReceived_at(cursor.getLong(19));
 		  sms.setIs_yet_printed(cursor.getInt(20));
-
+		  sms.setIs_online_saved(cursor.getInt(21));
 		  Log.e("SMS FROM CURSOR", sms.toString());
-
 	    return sms;
 	  }
 	  /*

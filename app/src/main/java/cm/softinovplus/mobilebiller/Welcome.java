@@ -1,6 +1,7 @@
 package cm.softinovplus.mobilebiller;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 
@@ -12,7 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.Explode;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.github.angads25.filepicker.view.FilePickerDialog;
@@ -43,70 +46,7 @@ public class Welcome extends AppCompatActivity {
 
         overridePendingTransition(R.anim.left_out, R.anim.right_out);
 
-       /* this.sms_body = "Transfert de 100000 FCFA effectue avec succes a DIDIER JUNIOR NKALLA EHAWE (237671747569) le 2018-09-26 09:30:45. FRAIS 250 FCFA. Transaction Id: 395587665 ; Reference: 123456789. Nouveau solde est: 33000 FCFA.";
 
-        //Log.e("pseudosubject", this.pseudoSubject);
-        //Toast.makeText(context,this.pseudoSubject, Toast.LENGTH_LONG).show();
-
-        //Log.e("service center address", this.serviceCenterAddress);
-        //Toast.makeText(context,this.serviceCenterAddress, Toast.LENGTH_LONG).show();
-
-
-        Pattern pattern = Pattern.compile("(^(\\w+)\\s+de\\s+(\\d+)\\s+(\\w+)\\s+effectue\\s+avec\\s+(\\w+)\\s+a\\s+(\\w+)((\\s+\\w+)*)\\s+\\((\\d+)\\)\\s+le\\s+(\\d{4})\\-(\\d{2})\\-(\\d{2})\\s+(\\d{2}):(\\d{2}):(\\d{2})\\.\\s+FRAIS\\s+(\\d+)\\s+\\w+\\.\\s+Transaction\\s+Id:\\s+(\\d+)\\s+;\\s+Reference:\\s+(\\d+)\\.\\s+Nouveau\\s+solde\\s+est:\\s+(\\d+)\\s(\\w+)\\.$)|(.)");
-        Matcher matcher = pattern.matcher(this.sms_body);
-
-        if (matcher.find()){
-            Log.e("1", matcher.group(1));
-        }else{
-            Log.e("2", "No match so far");
-        }*/
-
-
-        /*InputStream in = null;
-        try {
-            //in = getResources().getAssets().open(file);
-            in = getResources().getAssets().open("logo/logo.png");
-            Log.e("sizees", "" + in.available());
-            BufferedInputStream bis = new BufferedInputStream(in);
-            Bitmap bitmap = BitmapFactory.decodeStream(bis);
-
-            Log.e("WXH", "" + bitmap.getWidth() + ", " + bitmap.getHeight());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-
-       // assert in != null;
-
-        /*
-        SharedPreferences.Editor editor = getSharedPreferences(Util.APP_CONFIGURAION, MODE_PRIVATE).edit();
-                        //editor.putString(Util.TOKEN, Util.token);
-                        editor.putString(Util.EMAIL, this.email);
-                        editor.putString(Util.PASSWORD, this.password);
-                        //CheckBox checkbox_remember_me = (CheckBox) findViewById(R.id.checkbox_remember_me);;
-                        editor.putBoolean(Util.REMEMBER_ME, this.remember_me);
-                        editor.commit();
-                        spinner_password_login.setText("");
-                        spinner_login_email.setText("");
-
-
-
-
-
-
-            editor.putString(Util.TOKEN, Util.token);
-
-
-
-            //String email = prefs.getString(Util.REGISTRATION_NUMBER, null);
-            //String cni = prefs.getString(Util.CNI, null);
-            //String tel = prefs.getString(Util.TEL, null);
-            String email = prefs.getString(Util.EMAIL, null);
-            String password = prefs.getString(Util.PASSWORD, null);
-            boolean remmenber_me = prefs.getBoolean(Util.REMEMBER_ME, false);
-
-         */
 
         fragmentManager = getSupportFragmentManager();
 
@@ -115,15 +55,7 @@ public class Welcome extends AppCompatActivity {
             fragmentManager.beginTransaction().replace(R.id.frameContainer, new LoginFragment(), Utils.LoginFragment).commit();
         }
 
-        // On close icon click finish activity
-        /*findViewById(R.id.close_activity).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View arg0) {
-                        onBackPressed();
-                        //finish();
-                    }
-                });*/
+        hideKeyboard();
 
         initializeMap();
 
@@ -210,5 +142,12 @@ public class Welcome extends AppCompatActivity {
             replaceLoginFragment();
         else
             super.onBackPressed();
+    }
+    private void hideKeyboard() {
+        View view = getCurrentFocus();
+        if (view != null) {
+            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).
+                    hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 }

@@ -19,7 +19,7 @@ import cm.softinovplus.mobilebiller.sms.SMS;
 public class SMSsActivity extends AppCompatActivity {
 
     private List<SMS> smses;
-    private  ListView listView;
+    private  static ListView listView;
     private MySMSAdapter adapter;
     public static AppCompatActivity thisActivity;
     private int mStackLevel;
@@ -49,20 +49,16 @@ public class SMSsActivity extends AppCompatActivity {
 
     }
 
-    public  void refreshList(){
+    public  static void refreshList(){
 
         SMSDataSource smsDatatSource = new SMSDataSource(SMSsActivity.thisActivity);
         smsDatatSource.open();
-
         List<SMS> smss = smsDatatSource.getAllSMS();
         Log.e("sms size refreshList", "" + smss.size());
-        //if(smss.size() > 0){
-            MySMSAdapter mySMSAdapter = new MySMSAdapter(SMSsActivity.thisActivity, smss);
-            listView.setAdapter(mySMSAdapter);
-            mySMSAdapter.notifyDataSetChanged();
-            Log.e("REFRESHED", "Refreshed....");
-        //}
-
+        MySMSAdapter mySMSAdapter = new MySMSAdapter(SMSsActivity.thisActivity, smss);
+        listView.setAdapter(mySMSAdapter);
+        mySMSAdapter.notifyDataSetChanged();
+        Log.e("REFRESHED", "Refreshed....");
         smsDatatSource.close();
 
     }
