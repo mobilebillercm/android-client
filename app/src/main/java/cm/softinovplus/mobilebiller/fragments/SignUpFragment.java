@@ -1,25 +1,7 @@
 package cm.softinovplus.mobilebiller.fragments;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import android.app.ActivityOptions;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -39,7 +21,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -49,7 +30,31 @@ import com.github.angads25.filepicker.view.FilePickerDialog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import cm.softinovplus.mobilebiller.Authenticated;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManagerFactory;
+
 import cm.softinovplus.mobilebiller.R;
 import cm.softinovplus.mobilebiller.Welcome;
 import cm.softinovplus.mobilebiller.dialog.PolicyDialog;
@@ -60,7 +65,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class SignUpFragment extends Fragment  {
 	private static View view;
-	private static EditText edit_entreprise, edit_entreprise_description, edit_firtname, edit_lastname,
+	private static EditText edit_entreprise, edit_numero_contribuable, edit_number_trade_register, edit_entreprise_description, edit_firtname, edit_lastname,
             edit_email, edit_password, edit_password_confirmation, edit_logo, edit_phone, edit_city;
 	private static TextView login ;
 	private static Button signUpButton, terms_conditions_btn;
@@ -91,6 +96,8 @@ public class SignUpFragment extends Fragment  {
 	private void initViews() {
 
         edit_entreprise = (EditText) view.findViewById(R.id.edit_entreprise);
+        edit_numero_contribuable = (EditText) view.findViewById(R.id.edit_numero_contribuable);
+        edit_number_trade_register = (EditText) view.findViewById(R.id.edit_number_trade_register);
         edit_entreprise_description = (EditText) view.findViewById(R.id.edit_entreprise_description);
         edit_firtname = (EditText) view.findViewById(R.id.edit_firtname);
         edit_lastname = (EditText) view.findViewById(R.id.edit_lastname);
@@ -136,6 +143,8 @@ public class SignUpFragment extends Fragment  {
             public void onClick(View v) {
                 String entreprise = edit_entreprise.getText().toString().trim();
                 String description = edit_entreprise_description.getText().toString().trim();
+                String taxpayernumber = edit_numero_contribuable.getText().toString().trim();
+                String numbertraderegister = edit_number_trade_register.getText().toString().trim();
                 String firstname = edit_firtname.getText().toString().trim();
                 String lastname = edit_lastname.getText().toString().trim();
                 String email = edit_email.getText().toString().trim();
@@ -177,8 +186,10 @@ public class SignUpFragment extends Fragment  {
                     // Else do signup or do your stuff
                 else {
 
-                    DoSignup doSignup = new DoSignup(getActivity(), signup_loader,entreprise, description,
+                    DoSignup doSignup = new DoSignup(getActivity(), signup_loader,entreprise, description,taxpayernumber, numbertraderegister,
                             firstname, lastname, email, password, passwordConfirmation,logo_selected_path, phone, selectedRegion, city);
+                    TextView result_signup = view.findViewById(R.id.result_signup);
+                    result_signup.setText("");
                     doSignup.execute(/*"http://idea-cm.club/tenants.php"*/Utils.SIGNUP_URL);
                 }
 
@@ -252,7 +263,7 @@ public class SignUpFragment extends Fragment  {
 		mStackLevel++;
 
 		android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-		android.support.v4.app.Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
+		Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
 		if (prev != null) {
 			ft.remove(prev);
 		}
@@ -266,6 +277,8 @@ public class SignUpFragment extends Fragment  {
 	}
 
     private class DoSignup extends AsyncTask<String, Integer, String> {
+        private final String taxpayernumber;
+        private final String numbertraderegister;
         private ProgressBar dialog;
         private Context context;
         private String entreprise, description, firstname, lastname, email, password, phone, region, city;
@@ -277,13 +290,15 @@ public class SignUpFragment extends Fragment  {
             edit_email, edit_password, edit_password_confirmation, edit_logo, edit_phone, edit_city
          */
 
-        public DoSignup(Context context, ProgressBar dialog, String entreprise, String description,
+        public DoSignup(Context context, ProgressBar dialog, String entreprise, String description, String taxpayernumber, String numbertraderegister,
                         String firstname, String lastname, String email, String password, String password_confirmation, String logoPath,
                         String phone, String region, String city) {
             this.context = context;
             this.dialog = dialog;
             this.entreprise = entreprise;
             this.description = description;
+            this.taxpayernumber = taxpayernumber;
+            this.numbertraderegister = numbertraderegister;
             this.firstname = firstname;
             this.lastname = lastname;
             this.email = email;
@@ -314,17 +329,16 @@ public class SignUpFragment extends Fragment  {
                         "&adminitratorpassword_confirmation=" + this.password_confirmation;*/
 
                 Uri.Builder builder = new Uri.Builder();
-                builder.scheme("http")
-                        .authority("212.237.7.253")
-                        .appendPath("mobilebiller")
-                        .appendPath("ide")
-                        .appendPath("public")
+                builder.scheme("https")
+                        .encodedAuthority("mobilebiller.idea-cm.club:444")
                         .appendPath("api")
                         .appendPath("tenants-provisions")
                         .appendQueryParameter("administratoremail", this.email)
                         .appendQueryParameter("adminitratorpassword", this.password)
                         .appendQueryParameter("tenantname", this.entreprise)
                         .appendQueryParameter("tenantdescrition", this.description)
+                        .appendQueryParameter("taxpayernumber", this.taxpayernumber)
+                        .appendQueryParameter("numbertraderegister", this.numbertraderegister)
                         .appendQueryParameter("administratorfirstname", this.firstname)
                         .appendQueryParameter("administratorlastname", this.lastname)
                         .appendQueryParameter("administratorphone", this.phone)
@@ -334,13 +348,92 @@ public class SignUpFragment extends Fragment  {
 
                 String urlParameters = builder.build().toString();
 
-                url = new URL(/*str_url + "?" +*/ urlParameters);
+                url = new URL(urlParameters);
 
 
 
                 Log.e("urlParameters", urlParameters);
-                HttpURLConnection urlConnection;
-                DataOutputStream dos = null;
+                HttpsURLConnection urlConnection = null;
+
+
+                SSLContext context = null;
+                try {
+                    // Load CAs from an InputStream
+// (could be from a resource or ByteArrayInputStream or ...)
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+                    //InputStream caInput = new BufferedInputStream(getAssets().open("pridesoft.crt"));
+                    Certificate ca = null;
+                    try {
+                        try (InputStream caInput = getActivity().getAssets().open("mobilebiller.crt")) {
+                            ca = cf.generateCertificate(caInput);
+                            //Log.e("CA=",  "\n\n\n\n\n" + ((X509Certificate) ca).getSubjectDN() + "\n\n\n\n");
+                            //System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+// Create a KeyStore containing our trusted CAs
+                    String keyStoreType = KeyStore.getDefaultType();
+                    KeyStore keyStore = null;
+                    try {
+                        keyStore = KeyStore.getInstance(keyStoreType);
+                    } catch (KeyStoreException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        keyStore.load(null, null);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    keyStore.setCertificateEntry("ca", ca);
+
+                    HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
+
+// Create a TrustManager that trusts the CAs in our KeyStore
+                    String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+                    TrustManagerFactory tmf = null;
+                    try {
+                        tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        tmf.init(keyStore);
+                    } catch (KeyStoreException e) {
+                        e.printStackTrace();
+                    }
+
+// Create an SSLContext that uses our TrustManager
+                    try {
+                        context = SSLContext.getInstance("TLS");
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        context.init(null, tmf.getTrustManagers(), null);
+                    } catch (KeyManagementException e) {
+                        e.printStackTrace();
+                    }
+
+                    url = new URL(urlParameters);
+
+
+                    urlConnection = (HttpsURLConnection) url.openConnection();
+                    urlConnection.setSSLSocketFactory(context.getSocketFactory());
+                    urlConnection.setHostnameVerifier(new NullHostNameVerifier());
+
+                } catch (CertificateException e) {
+                    e.printStackTrace();
+                } catch (KeyStoreException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }                DataOutputStream dos = null;
                 String lineEnd = "\r\n";
                 String twoHyphens = "--";
                 String boundary = "*****";
@@ -359,7 +452,7 @@ public class SignUpFragment extends Fragment  {
                         FileInputStream fileInputStream = new FileInputStream(sourceFile);
 
                         Log.e("URL", str_url);
-                        urlConnection = (HttpURLConnection) url.openConnection();
+                        //urlConnection = (HttpURLConnection) url.openConnection();
                         urlConnection.setRequestMethod("POST");
                         urlConnection.setDoInput(true);
                         urlConnection.setDoOutput(true);
@@ -518,6 +611,24 @@ public class SignUpFragment extends Fragment  {
             }
 
 
+        }
+    }
+
+    private class NullHostNameVerifier implements HostnameVerifier {
+        @Override
+        public boolean verify(String s, SSLSession sslSession) {
+            boolean retVal;
+            try {
+                HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
+                retVal =  Build.VERSION.SDK_INT >= Build.VERSION_CODES.BASE_1_1 && Utils.HOSTNAME.equals("mobilebiller.idea-cm.club");
+                //hv.verify("pridesoft.armp.cm", sslSession);
+                //retVal = true;
+            }catch (Exception e){
+                //e.getStackTrace();
+                //Log.e("NullHostNameVerifier", e.getMessage() + "\n\n\n" + e.getCause() + "\n\n\n");
+                retVal = false;
+            }
+            return retVal;
         }
     }
 }

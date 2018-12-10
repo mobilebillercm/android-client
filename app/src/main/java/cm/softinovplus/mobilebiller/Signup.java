@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatSpinner;
@@ -36,8 +37,21 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManagerFactory;
 
 import cm.softinovplus.mobilebiller.dialog.PolicyDialog;
 import cm.softinovplus.mobilebiller.fragments.SignUpFragment;
@@ -162,6 +176,8 @@ public class Signup extends AppCompatActivity {
 
                     DoSignup doSignup = new DoSignup(Signup.this, signup_loader,entreprise, description,
                             firstname, lastname, email, password, passwordConfirmation,logo_selected_path, phone, selectedRegion, city);
+                    TextView result_signup = findViewById(R.id.result_signup);
+                    result_signup.setText("");
                     doSignup.execute(Utils.SIGNUP_URL);
                 }
 
@@ -259,7 +275,7 @@ public class Signup extends AppCompatActivity {
             edit_email, edit_password, edit_password_confirmation, edit_logo, edit_phone, edit_city
          */
 
-        public DoSignup(Context context, ProgressBar dialog, String entreprise, String description,
+        private DoSignup(Context context, ProgressBar dialog, String entreprise, String description,
                         String firstname, String lastname, String email, String password, String password_confirmation, String logoPath,
                         String phone, String region, String city) {
             this.context = context;
@@ -295,11 +311,8 @@ public class Signup extends AppCompatActivity {
                         + "&administratorlastname=" + this.lastname +"&administratorphone=" + this.phone + "&tenantcity=" + this.city + "&tenantregion=" + this.region+
                         "&adminitratorpassword_confirmation=" + this.password_confirmation;*/
                 Uri.Builder builder = new Uri.Builder();
-                builder.scheme("http")
-                        .authority("212.237.7.253")
-                        .appendPath("mobilebiller")
-                        .appendPath("ide")
-                        .appendPath("public")
+                builder.scheme("https")
+                        .encodedAuthority("mobilebiller.idea-cm.club:444")
                         .appendPath("api")
                         .appendPath("tenants-provisions")
                         .appendQueryParameter("administratoremail", this.email)
@@ -313,14 +326,94 @@ public class Signup extends AppCompatActivity {
                         .appendQueryParameter("tenantregion", this.region)
                         .appendQueryParameter("adminitratorpassword_confirmation", this.password_confirmation);
 
+                //Log.e("apres  ")
                 String urlParameters = builder.build().toString();
                 url = new URL(/*str_url + "?" +*/ urlParameters);
 
 
 
                 Log.e("urlParameters", urlParameters);
-                HttpURLConnection urlConnection;
-                DataOutputStream dos = null;
+                HttpsURLConnection urlConnection = null;
+
+
+                SSLContext context = null;
+                try {
+                    // Load CAs from an InputStream
+// (could be from a resource or ByteArrayInputStream or ...)
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+                    //InputStream caInput = new BufferedInputStream(getAssets().open("pridesoft.crt"));
+                    Certificate ca = null;
+                    try {
+                        try (InputStream caInput = getAssets().open("mobilebiller.crt")) {
+                            ca = cf.generateCertificate(caInput);
+                            //Log.e("CA=",  "\n\n\n\n\n" + ((X509Certificate) ca).getSubjectDN() + "\n\n\n\n");
+                            //System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+// Create a KeyStore containing our trusted CAs
+                    String keyStoreType = KeyStore.getDefaultType();
+                    KeyStore keyStore = null;
+                    try {
+                        keyStore = KeyStore.getInstance(keyStoreType);
+                    } catch (KeyStoreException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        keyStore.load(null, null);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    keyStore.setCertificateEntry("ca", ca);
+
+                    HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
+
+// Create a TrustManager that trusts the CAs in our KeyStore
+                    String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+                    TrustManagerFactory tmf = null;
+                    try {
+                        tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        tmf.init(keyStore);
+                    } catch (KeyStoreException e) {
+                        e.printStackTrace();
+                    }
+
+// Create an SSLContext that uses our TrustManager
+                    try {
+                        context = SSLContext.getInstance("TLS");
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        context.init(null, tmf.getTrustManagers(), null);
+                    } catch (KeyManagementException e) {
+                        e.printStackTrace();
+                    }
+
+                    url = new URL(urlParameters);
+
+
+                    urlConnection = (HttpsURLConnection) url.openConnection();
+                    urlConnection.setSSLSocketFactory(context.getSocketFactory());
+                    urlConnection.setHostnameVerifier(new NullHostNameVerifier());
+
+                } catch (CertificateException e) {
+                    e.printStackTrace();
+                } catch (KeyStoreException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }                 DataOutputStream dos = null;
                 String lineEnd = "\r\n";
                 String twoHyphens = "--";
                 String boundary = "*****";
@@ -339,7 +432,7 @@ public class Signup extends AppCompatActivity {
                         FileInputStream fileInputStream = new FileInputStream(sourceFile);
 
                         Log.e("URL", str_url);
-                        urlConnection = (HttpURLConnection) url.openConnection();
+                        //urlConnection = (HttpURLConnection) url.openConnection();
                         urlConnection.setRequestMethod("POST");
                         urlConnection.setDoInput(true);
                         urlConnection.setDoOutput(true);
@@ -498,6 +591,25 @@ public class Signup extends AppCompatActivity {
             }
 
 
+        }
+    }
+
+
+    private class NullHostNameVerifier implements HostnameVerifier {
+        @Override
+        public boolean verify(String s, SSLSession sslSession) {
+            boolean retVal;
+            try {
+                HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
+                retVal =  Build.VERSION.SDK_INT >= Build.VERSION_CODES.BASE_1_1 && Utils.HOSTNAME.equals("mobilebiller.idea-cm.club");
+                //hv.verify("pridesoft.armp.cm", sslSession);
+                //retVal = true;
+            }catch (Exception e){
+                //e.getStackTrace();
+                //Log.e("NullHostNameVerifier", e.getMessage() + "\n\n\n" + e.getCause() + "\n\n\n");
+                retVal = false;
+            }
+            return retVal;
         }
     }
 }

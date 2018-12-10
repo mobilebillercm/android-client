@@ -29,8 +29,9 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ELECTRONIC AND MOBILE TECHNOLOGY"
+        android:text="SOFT INOV +"
         android:gravity="center"
+        android:id="@+id/tenant_name"
         android:textColor="@color/white"/>
 
     <TextView

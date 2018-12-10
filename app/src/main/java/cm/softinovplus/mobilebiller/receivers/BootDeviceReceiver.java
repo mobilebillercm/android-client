@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.provider.Telephony;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,8 +18,6 @@ import java.util.List;
 
 import cm.softinovplus.mobilebiller.services.RunAfterBootService;
 import cm.softinovplus.mobilebiller.utils.Utils;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by nkalla on 16/09/18.

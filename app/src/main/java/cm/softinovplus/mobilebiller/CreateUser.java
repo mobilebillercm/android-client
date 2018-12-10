@@ -5,10 +5,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -23,9 +26,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -33,6 +36,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -43,69 +48,121 @@ import javax.net.ssl.TrustManagerFactory;
 import cm.softinovplus.mobilebiller.utils.CustomToast;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
-public class ChangePassword extends AppCompatActivity {
+public class CreateUser extends AppCompatActivity {
 
-    private EditText edit_current_password, edit_new_password, edit_new_password_confirmation;
-    private Button changepwd;
-    private ProgressBar changepwd_loader;
+    private TextView titre_create_user, result_create_user;
+    private EditText edit_firtname, edit_lastname, edit_email, edit_phone, edit_city;
+    private AppCompatSpinner spinner_region;
+    private String selectedRegion;
     private SharedPreferences authPreferences;
-    private TextView result_change_pwd;
+
+    private ProgressBar create_loader;
+    private Button createBtn;
+
+    private ArrayAdapter<CharSequence> adapter;
+    private View invite_user_root_view;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_change_password);
-        edit_current_password = findViewById(R.id.edit_current_password);
-        edit_new_password = findViewById(R.id.edit_new_password);
-        edit_new_password_confirmation = findViewById(R.id.edit_new_password_confirmation);
-        changepwd = findViewById(R.id.changepwd);
-        changepwd_loader = findViewById(R.id.changepwd_loader);
-        authPreferences = getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
-        result_change_pwd = findViewById(R.id.result_change_pwd);
+        setContentView(R.layout.activity_create_user);
 
-        changepwd.setOnClickListener(new View.OnClickListener() {
+        titre_create_user = findViewById(R.id.titre_create_user);
+        result_create_user = findViewById(R.id.result_create_user);
+
+        edit_firtname = findViewById(R.id.edit_firtname);
+        edit_lastname = findViewById(R.id.edit_lastname);
+        edit_email = findViewById(R.id.edit_email);
+        edit_phone = findViewById(R.id.edit_phone);
+        edit_city = findViewById(R.id.edit_city);
+        invite_user_root_view = findViewById(R.id.invite_user_root_view);
+
+        createBtn = findViewById(R.id.createBtn);
+
+        authPreferences = getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+        titre_create_user.setText(authPreferences.getString(Utils.TENANT_NAME, ""));
+
+        spinner_region =  findViewById(R.id.spinner_region);
+        create_loader = findViewById(R.id.create_loader);
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        adapter = ArrayAdapter.createFromResource(this, R.array.regions, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner_region.setAdapter(adapter);
+        selectedRegion = adapter.getItem(0).toString();
+        Log.e("selectedRegion", selectedRegion);
+
+        createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!localAuthenticateUser()){
-                    View changepwd_root_view = findViewById(R.id.changepwd_root_view);
-                    new CustomToast().Show_Toast(ChangePassword.this, changepwd_root_view, "Mot de Passe invalide.");
-                }else if(!edit_new_password.getText().toString().equals(edit_new_password_confirmation.getText().toString())){
-                    View changepwd_root_view = findViewById(R.id.changepwd_root_view);
-                    new CustomToast().Show_Toast(ChangePassword.this, changepwd_root_view, "Le Mot de Passe et sa Confirmation sont distincts.");
-                }else{
-                    result_change_pwd.setText("");
-                    DoChangePassword doChangePassword = new DoChangePassword(getApplicationContext(),
-                            changepwd_loader,edit_current_password.getText().toString(), edit_new_password.getText().toString(),
-                            edit_new_password_confirmation.getText().toString(), authPreferences.getString(Utils.TENANT_ID, ""),
-                            authPreferences.getString(Utils.ACCESS_TOKEN, ""));
-                    doChangePassword.execute(Utils.HOST_IDENTITY_AND_ACCESS + "api/users/" + authPreferences.getString(Utils.EMAIL,"") + "/change-password");
-                }
+                String firstname = edit_firtname.getText().toString().trim();
+                String lastname = edit_lastname.getText().toString().trim();
+                String email = edit_email.getText().toString().trim();
+                String phone = edit_phone.getText().toString().trim();
+                String city = edit_city.getText().toString().trim();
 
+                // Pattern match for email id
+                Pattern p = Pattern.compile(Utils.REGEX_EMAIL);
+                Matcher m = p.matcher(email);
+
+
+
+                // Check if all strings are null or not
+                if (firstname.equals("") || firstname.length() == 0
+                        || lastname.equals("") || lastname.length() == 0
+                        || email.equals("") || email.length() == 0
+                        || phone.equals("") || phone.length() == 0
+                        || city.equals("") || city.length() == 0){
+                    new CustomToast().Show_Toast(CreateUser.this, invite_user_root_view, "All fields are required.");
+                }// Check if email id valid or not
+                else if (!m.find()){
+                    new CustomToast().Show_Toast(CreateUser.this, invite_user_root_view, "Your Email Id is Invalid.");
+                }// Check if both password should be equal
+                else {
+
+                    result_create_user.setText("");
+                    DoCreateUser doCreateUser = new DoCreateUser(CreateUser.this, create_loader,
+                            firstname, lastname, email, phone, selectedRegion, city, authPreferences.getString(Utils.USERID,""),
+                            authPreferences.getString(Utils.TENANT_ID,""), authPreferences.getString(Utils.ACCESS_TOKEN,""));
+                    doCreateUser.execute(Utils.HOST_IDENTITY_AND_ACCESS + "api/users-subaccounts?scope=SCOPE_MANAGE_SUBACCOUNT_ACCESSES");
+                }
             }
         });
 
+        spinner_region.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedRegion = adapter.getItem(position).toString();
+                Log.e("selectedRegion", selectedRegion);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                selectedRegion = null;
+            }
+        });
     }
 
-    public boolean localAuthenticateUser(){
-        return authPreferences.getString(Utils.PASSWORD, "").equals(edit_current_password.getText().toString());
-    }
 
-    private class DoChangePassword extends AsyncTask<String, Integer, String> {
+    private class DoCreateUser extends AsyncTask<String, Integer, String> {
+        private String token;
         private ProgressBar dialog;
         private Context context;
-        private String currentPassword;
-        private String newPassword;
-        private String newPasswordConfirmation;
-        private String tenantid;
-        private String token;
+        private String firstname, lastname, email, phone, region, city, userid, tenantid;
         private int statusCode = 0;
 
-        public DoChangePassword(Context context, ProgressBar dialog, String currentPassword,
-                                String newPassword, String newPasswordConfirmation, String tenantid, String token) {
+        public DoCreateUser(Context context, ProgressBar dialog, String firstname, String lastname, String email,
+                            String phone, String region, String city, String userid, String tenantid,String token) {
             this.context = context;
             this.dialog = dialog;
-            this.currentPassword = currentPassword;
-            this.newPassword = newPassword;
-            this.newPasswordConfirmation = newPasswordConfirmation;
+            this.firstname = firstname;
+            this.lastname = lastname;
+            this.email = email;
+            this.phone = phone;
+            this.city = city;
+            this.region = region;
+            this.userid = userid;
             this.tenantid = tenantid;
             this.token = token;
         }
@@ -213,18 +270,21 @@ public class ChangePassword extends AppCompatActivity {
                     urlConnection.setRequestProperty (Utils.AUTHORIZATION, Utils.BEARER + " " + this.token);
                     //urlConnection.setRequestProperty(Utils.CONTENT_TYPE, Utils.APPLICATION_JSON);
                     //JSONObject body = new JSONObject();
-                    //body.put("oldpassword", this.currentPassword);
-                    //body.put("newpassword", this.newPassword);
-                    //body.put("newpasswordconfirmation", this.newPasswordConfirmation);
-                    String query = "oldpassword=" + this.currentPassword + "&newpassword=" + this.newPassword +
-                            "&newpasswordconfirmation=" + this.newPasswordConfirmation + "&tenantid=" + this.tenantid;
+                    //body.put("firstname", this.firstname);
+                    //body.put("lastname", this.lastname);
+                    //body.put("email", this.email);
+                    //body.put("phone", this.phone);
+                    //body.put("city", this.city);
+                    //body.put("region", this.region);
+                    String query = "firstname=" + URLEncoder.encode(this.firstname, "UTF-8") + "&lastname=" + URLEncoder.encode(this.lastname ,"UTF-8")+ "&email=" + this.email
+                            +"&tenantid=" + this.tenantid + "&phone1=" + URLEncoder.encode(this.phone, "UTF-8") + "&invited_by=" + this.userid +
+                            "&city=" + URLEncoder.encode(this.city, "UTF-8") + "&region=" + URLEncoder.encode(this.region, "UTF-8");
                     //body.toString();//"email=" + this.username + "&password=" + this.pwd;
                     Log.e("query", query);
                     OutputStream os = urlConnection.getOutputStream();
                     OutputStreamWriter out = new OutputStreamWriter(os);
                     out.write(query);
                     out.close();
-
                     this.statusCode = urlConnection.getResponseCode();
 
                     Log.e("statusCode", "4: " + statusCode);
@@ -298,24 +358,19 @@ public class ChangePassword extends AppCompatActivity {
             try {
                 JSONObject returnedResult = new JSONObject(result);
                 if (returnedResult.has("success") && returnedResult.getInt("success") == 1 && returnedResult.has("faillure") && returnedResult.getInt("faillure") == 0){
-                    result_change_pwd.setTextColor(Color.rgb(0,200,0));
-                    SharedPreferences.Editor editor = authPreferences.edit();
-                    editor.putString(Utils.PASSWORD,this.newPassword);
-                    editor.apply();
-                    result_change_pwd.setText(R.string.pwd_successfully_changed);
-
+                    result_create_user.setText(returnedResult.getString(Utils.RESPONSE));
+                    result_create_user.setTextColor(Color.GREEN);
                 }else {
-                    result_change_pwd.setTextColor(Color.rgb(200, 0,0));
-                    result_change_pwd.setText(R.string.failed_to_change_pwd + "(" + returnedResult.getString("raison") + ")");
+                    result_create_user.setText(returnedResult.getString(Utils.RAISON));
+                    result_create_user.setTextColor(Color.RED);
                 }
-
             } catch (JSONException e) {
-                e.printStackTrace();
-                result_change_pwd.setTextColor(Color.rgb(200, 0,0));
-                result_change_pwd.setText(R.string.failed_to_change_pwd + "(" + e.getMessage() + ")");
+                //e.printStackTrace();
+                result_create_user.setText("Whoop Something Went wrong!!!");
+                result_create_user.setTextColor(Color.RED);
             }
 
-            Log.e("result", result);
+            // Log.e("result", result);
         }
     }
 
@@ -337,4 +392,5 @@ public class ChangePassword extends AppCompatActivity {
             return retVal;
         }
     }
+
 }

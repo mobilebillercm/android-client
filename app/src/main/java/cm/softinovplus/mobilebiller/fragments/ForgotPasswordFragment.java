@@ -1,25 +1,6 @@
 package cm.softinovplus.mobilebiller.fragments;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import android.app.ActivityOptions;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
-import android.content.res.XmlResourceParser;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -48,15 +29,37 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import cm.softinovplus.mobilebiller.Authenticated;
-import cm.softinovplus.mobilebiller.PrintNewSMS;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManagerFactory;
+
 import cm.softinovplus.mobilebiller.R;
-import cm.softinovplus.mobilebiller.Welcome;
 import cm.softinovplus.mobilebiller.utils.CustomToast;
 import cm.softinovplus.mobilebiller.utils.Tenant;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
-import static android.content.Context.MODE_PRIVATE;
 import static cm.softinovplus.mobilebiller.utils.Utils.SignUpFragment;
 
 public class ForgotPasswordFragment extends Fragment implements OnClickListener {
@@ -117,6 +120,7 @@ public class ForgotPasswordFragment extends Fragment implements OnClickListener 
 		fragmentManager = getActivity().getSupportFragmentManager();
 		emailId = (EditText) view.findViewById(R.id.registered_emailid);
 		submit = (Button) view.findViewById(R.id.forgot_button);
+		//submit.setEnabled(false);
 		createAccount = view.findViewById(R.id.createAccount);
 		spinner_tenant = view.findViewById(R.id.spinner_tenant);
 		tenant_layout = view.findViewById(R.id.tenant_layout);
@@ -270,10 +274,90 @@ public class ForgotPasswordFragment extends Fragment implements OnClickListener 
 			URL url = null;
 			try {
 				url = new URL(str_url);
-				HttpURLConnection urlConnection;
+				HttpsURLConnection urlConnection = null;
+
+
+				SSLContext context = null;
+				try {
+					// Load CAs from an InputStream
+// (could be from a resource or ByteArrayInputStream or ...)
+					CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+					//InputStream caInput = new BufferedInputStream(getAssets().open("pridesoft.crt"));
+					Certificate ca = null;
+					try {
+						try (InputStream caInput = getActivity().getAssets().open("mobilebiller.crt")) {
+							ca = cf.generateCertificate(caInput);
+							//Log.e("CA=",  "\n\n\n\n\n" + ((X509Certificate) ca).getSubjectDN() + "\n\n\n\n");
+							//System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+// Create a KeyStore containing our trusted CAs
+					String keyStoreType = KeyStore.getDefaultType();
+					KeyStore keyStore = null;
+					try {
+						keyStore = KeyStore.getInstance(keyStoreType);
+					} catch (KeyStoreException e) {
+						e.printStackTrace();
+					}
+					try {
+						keyStore.load(null, null);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					}
+					keyStore.setCertificateEntry("ca", ca);
+
+					HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
+
+// Create a TrustManager that trusts the CAs in our KeyStore
+					String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+					TrustManagerFactory tmf = null;
+					try {
+						tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+					} catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					}
+					try {
+						tmf.init(keyStore);
+					} catch (KeyStoreException e) {
+						e.printStackTrace();
+					}
+
+// Create an SSLContext that uses our TrustManager
+					try {
+						context = SSLContext.getInstance("TLS");
+					} catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					}
+					try {
+						context.init(null, tmf.getTrustManagers(), null);
+					} catch (KeyManagementException e) {
+						e.printStackTrace();
+					}
+
+					url = new URL(str_url);
+
+
+					urlConnection = (HttpsURLConnection) url.openConnection();
+					urlConnection.setSSLSocketFactory(context.getSocketFactory());
+					urlConnection.setHostnameVerifier(new NullHostNameVerifier());
+
+				} catch (CertificateException e) {
+					e.printStackTrace();
+				} catch (KeyStoreException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				try {
 					Log.e("URL", str_url);
-					urlConnection = (HttpURLConnection) url.openConnection();
+					//urlConnection = (HttpURLConnection) url.openConnection();
 					urlConnection.setRequestMethod("POST");
 					urlConnection.setDoInput(true);
 					urlConnection.setDoOutput(true);
@@ -404,10 +488,89 @@ public class ForgotPasswordFragment extends Fragment implements OnClickListener 
 			URL url = null;
 			try {
 				url = new URL(str_url);
-				HttpURLConnection urlConnection;
+				HttpsURLConnection urlConnection = null;
+
+
+				SSLContext context = null;
 				try {
+					// Load CAs from an InputStream
+// (could be from a resource or ByteArrayInputStream or ...)
+					CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+					//InputStream caInput = new BufferedInputStream(getAssets().open("pridesoft.crt"));
+					Certificate ca = null;
+					try {
+						try (InputStream caInput = getActivity().getAssets().open("mobilebiller.crt")) {
+							ca = cf.generateCertificate(caInput);
+							//Log.e("CA=",  "\n\n\n\n\n" + ((X509Certificate) ca).getSubjectDN() + "\n\n\n\n");
+							//System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+// Create a KeyStore containing our trusted CAs
+					String keyStoreType = KeyStore.getDefaultType();
+					KeyStore keyStore = null;
+					try {
+						keyStore = KeyStore.getInstance(keyStoreType);
+					} catch (KeyStoreException e) {
+						e.printStackTrace();
+					}
+					try {
+						keyStore.load(null, null);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					}
+					keyStore.setCertificateEntry("ca", ca);
+
+					HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
+
+// Create a TrustManager that trusts the CAs in our KeyStore
+					String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+					TrustManagerFactory tmf = null;
+					try {
+						tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+					} catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					}
+					try {
+						tmf.init(keyStore);
+					} catch (KeyStoreException e) {
+						e.printStackTrace();
+					}
+
+// Create an SSLContext that uses our TrustManager
+					try {
+						context = SSLContext.getInstance("TLS");
+					} catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					}
+					try {
+						context.init(null, tmf.getTrustManagers(), null);
+					} catch (KeyManagementException e) {
+						e.printStackTrace();
+					}
+
+					url = new URL(str_url);
+
+
+					urlConnection = (HttpsURLConnection) url.openConnection();
+					urlConnection.setSSLSocketFactory(context.getSocketFactory());
+					urlConnection.setHostnameVerifier(new NullHostNameVerifier());
+
+				} catch (CertificateException e) {
+					e.printStackTrace();
+				} catch (KeyStoreException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}				try {
 					Log.e("TENANT URL", str_url);
-					urlConnection = (HttpURLConnection) url.openConnection();
+					//urlConnection = (HttpURLConnection) url.openConnection();
 					urlConnection.setRequestMethod("GET");
 					urlConnection.setDoInput(true);
 
@@ -522,6 +685,8 @@ public class ForgotPasswordFragment extends Fragment implements OnClickListener 
 						tenant_layout.setVisibility(View.GONE);
 					}
 
+
+
 				}else{
 					textView.setText("Woop Something went Wrong...");
 				}
@@ -531,6 +696,24 @@ public class ForgotPasswordFragment extends Fragment implements OnClickListener 
 			}
 
 			Log.e("result", result);
+		}
+	}
+
+	private class NullHostNameVerifier implements HostnameVerifier {
+		@Override
+		public boolean verify(String s, SSLSession sslSession) {
+			boolean retVal;
+			try {
+				HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
+				retVal =  Build.VERSION.SDK_INT >= Build.VERSION_CODES.BASE_1_1 && Utils.HOSTNAME.equals("mobilebiller.idea-cm.club");
+				//hv.verify("pridesoft.armp.cm", sslSession);
+				//retVal = true;
+			}catch (Exception e){
+				//e.getStackTrace();
+				//Log.e("NullHostNameVerifier", e.getMessage() + "\n\n\n" + e.getCause() + "\n\n\n");
+				retVal = false;
+			}
+			return retVal;
 		}
 	}
 }

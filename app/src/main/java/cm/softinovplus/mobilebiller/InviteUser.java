@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatSpinner;
@@ -31,8 +32,22 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManagerFactory;
 
 import cm.softinovplus.mobilebiller.utils.CustomToast;
 import cm.softinovplus.mobilebiller.utils.Utils;
@@ -117,7 +132,7 @@ public class InviteUser extends AppCompatActivity {
                     DoInviteUser doInviteUser = new DoInviteUser(InviteUser.this, invite_loader,
                             firstname, lastname, email, phone, selectedRegion, city, authPreferences.getString(Utils.USERID,""),
                             authPreferences.getString(Utils.TENANT_ID,""), authPreferences.getString(Utils.ACCESS_TOKEN,""));
-                    doInviteUser.execute(Utils.HOST_IDENTITY_AND_ACCESS + "api/users-invitations?scope=" + Utils.SCOPE_MANAGE_IDENTITIES_AND_ACCESSES);
+                    doInviteUser.execute(Utils.HOST_IDENTITY_AND_ACCESS + "api/users-invitations?scope=SCOPE_MANAGE_COLLABORATORS");
                 }
             }
         });
@@ -144,7 +159,7 @@ public class InviteUser extends AppCompatActivity {
         private int statusCode = 0;
 
         public DoInviteUser(Context context, ProgressBar dialog, String firstname, String lastname, String email,
-                        String phone, String region, String city, String userid, String tenantid,String token) {
+                            String phone, String region, String city, String userid, String tenantid,String token) {
             this.context = context;
             this.dialog = dialog;
             this.firstname = firstname;
@@ -171,10 +186,89 @@ public class InviteUser extends AppCompatActivity {
             URL url = null;
             try {
                 url = new URL(str_url);
-                HttpURLConnection urlConnection;
+                HttpsURLConnection urlConnection = null;
+
+
+                SSLContext context = null;
                 try {
+                    // Load CAs from an InputStream
+// (could be from a resource or ByteArrayInputStream or ...)
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+// From https://www.washington.edu/itconnect/security/ca/load-der.crt
+                    //InputStream caInput = new BufferedInputStream(getAssets().open("pridesoft.crt"));
+                    Certificate ca = null;
+                    try {
+                        try (InputStream caInput = getAssets().open("mobilebiller.crt")) {
+                            ca = cf.generateCertificate(caInput);
+                            //Log.e("CA=",  "\n\n\n\n\n" + ((X509Certificate) ca).getSubjectDN() + "\n\n\n\n");
+                            //System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+// Create a KeyStore containing our trusted CAs
+                    String keyStoreType = KeyStore.getDefaultType();
+                    KeyStore keyStore = null;
+                    try {
+                        keyStore = KeyStore.getInstance(keyStoreType);
+                    } catch (KeyStoreException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        keyStore.load(null, null);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    keyStore.setCertificateEntry("ca", ca);
+
+                    HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
+
+// Create a TrustManager that trusts the CAs in our KeyStore
+                    String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+                    TrustManagerFactory tmf = null;
+                    try {
+                        tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        tmf.init(keyStore);
+                    } catch (KeyStoreException e) {
+                        e.printStackTrace();
+                    }
+
+// Create an SSLContext that uses our TrustManager
+                    try {
+                        context = SSLContext.getInstance("TLS");
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        context.init(null, tmf.getTrustManagers(), null);
+                    } catch (KeyManagementException e) {
+                        e.printStackTrace();
+                    }
+
+                    url = new URL(str_url);
+
+
+                    urlConnection = (HttpsURLConnection) url.openConnection();
+                    urlConnection.setSSLSocketFactory(context.getSocketFactory());
+                    urlConnection.setHostnameVerifier(new NullHostNameVerifier());
+
+                } catch (CertificateException e) {
+                    e.printStackTrace();
+                } catch (KeyStoreException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }                try {
                     Log.e("URL", str_url);
-                    urlConnection = (HttpURLConnection) url.openConnection();
+                    //urlConnection = (HttpURLConnection) url.openConnection();
                     urlConnection.setRequestMethod("POST");
                     urlConnection.setDoInput(true);
                     urlConnection.setDoOutput(true);
@@ -188,9 +282,9 @@ public class InviteUser extends AppCompatActivity {
                     //body.put("phone", this.phone);
                     //body.put("city", this.city);
                     //body.put("region", this.region);
-                    String query = "firstname=" + this.firstname + "&lastname=" + this.lastname + "&email=" + this.email
-                            +"&tenantid=" + this.tenantid + "&phone1=" + this.phone + "&invited_by=" + this.userid +
-                            "&city=" + this.city + "&region=" + this.region;
+                    String query = "firstname=" + URLEncoder.encode(this.firstname, "UTF-8") + "&lastname=" + URLEncoder.encode(this.lastname ,"UTF-8")+ "&email=" + this.email
+                            +"&tenantid=" + this.tenantid + "&phone1=" + URLEncoder.encode(this.phone, "UTF-8") + "&invited_by=" + this.userid +
+                            "&city=" + URLEncoder.encode(this.city, "UTF-8") + "&region=" + this.region;
                     //body.toString();//"email=" + this.username + "&password=" + this.pwd;
                     Log.e("query", query);
                     OutputStream os = urlConnection.getOutputStream();
@@ -282,7 +376,26 @@ public class InviteUser extends AppCompatActivity {
                 result_invite_user.setTextColor(Color.RED);
             }
 
-           // Log.e("result", result);
+            // Log.e("result", result);
+        }
+    }
+
+
+    private class NullHostNameVerifier implements HostnameVerifier {
+        @Override
+        public boolean verify(String s, SSLSession sslSession) {
+            boolean retVal;
+            try {
+                HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
+                retVal =  Build.VERSION.SDK_INT >= Build.VERSION_CODES.BASE_1_1 && Utils.HOSTNAME.equals("mobilebiller.idea-cm.club");
+                //hv.verify("pridesoft.armp.cm", sslSession);
+                //retVal = true;
+            }catch (Exception e){
+                //e.getStackTrace();
+                //Log.e("NullHostNameVerifier", e.getMessage() + "\n\n\n" + e.getCause() + "\n\n\n");
+                retVal = false;
+            }
+            return retVal;
         }
     }
 }
