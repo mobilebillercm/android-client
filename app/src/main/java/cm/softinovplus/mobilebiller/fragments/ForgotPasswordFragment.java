@@ -82,7 +82,6 @@ public class ForgotPasswordFragment extends Fragment implements OnClickListener 
         @Override
         public void run() {
             // TODO: PUT CODE HERE TO HANDLE CURRENT VALUE OF EDIT TEXT AND SEND TO SERVER
-
             // Check patter for email id
             String email = emailId.getText().toString();
             if (email.length() > 0){

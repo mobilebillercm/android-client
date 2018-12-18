@@ -1,7 +1,5 @@
 package cm.softinovplus.mobilebiller.dialog;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -11,10 +9,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import cm.softinovplus.mobilebiller.Authenticated;
 import cm.softinovplus.mobilebiller.DefaulPrinterConfigActivity;
 import cm.softinovplus.mobilebiller.R;
-import cm.softinovplus.mobilebiller.utils.Utils;
 
 public class DefaultBluetoothSettingDialog extends DialogFragment {
     private DefaultBluetoothSettingDialog this_delete_dialog;

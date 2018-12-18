@@ -64,7 +64,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
 import cm.softinovplus.mobilebiller.Authenticated;
-import cm.softinovplus.mobilebiller.PrintNewSMS;
 import cm.softinovplus.mobilebiller.R;
 import cm.softinovplus.mobilebiller.utils.CustomToast;
 import cm.softinovplus.mobilebiller.utils.Tenant;

@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -25,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
-import cm.softinovplus.mobilebiller.adapter.SettingBluetoothAdapter;
 import cm.softinovplus.mobilebiller.db.SMSDataSource;
 import cm.softinovplus.mobilebiller.sms.SMS;
 import cm.softinovplus.mobilebiller.utils.Utils;

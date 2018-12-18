@@ -8,8 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import cm.softinovplus.mobilebiller.sms.SMS;
-
 /**
  * Created by nkalla on 11/09/18.
  */
@@ -28,7 +26,7 @@ import cm.softinovplus.mobilebiller.sms.SMS;
         public static final String REMOTE_REGULAREXPRESSION = "remote_regular_expression";
 
 
-        public static int NOTIFICATION_ID = 1;
+    public static int NOTIFICATION_ID = 1;
         public static final String NAME = "name";
         public static final String LIBELE_PDV = "libele_pdv";
 
@@ -139,6 +137,11 @@ import cm.softinovplus.mobilebiller.sms.SMS;
         public static final String ORANGECAMEROON                    = "orangecameroon";
         public static final String FRENCHVERSION                     = "frenchversion";
         public static final String ENGLISHVERSION                    = "englishversion";
+        public static final int READ_REQUEST_CODE                    = 200;
+
+    
+        public static JSONArray SEARCH_RESULT_RESPONSE;
+
 
     public static final String  SERVICE_ACCESS_CLIENT_SECRET     =  "OVywGpw9AYBDMckYSnmmLUvggMSVJGLiUdDr3Dsj";
         public static final String SERVICE_ACCESS_ACCESS_TOKEN_END_POINT     = "https://mobilebiller.idea-cm.club:4445/oauth/token";
@@ -150,8 +153,7 @@ import cm.softinovplus.mobilebiller.sms.SMS;
 
 
 
-
-        //public static final String ACCESS_TOKEN_EXPIRY_DATE          = "ACCESS_TOKEN_EXPIRY_DATE";
+    //public static final String ACCESS_TOKEN_EXPIRY_DATE          = "ACCESS_TOKEN_EXPIRY_DATE";
 
 
 

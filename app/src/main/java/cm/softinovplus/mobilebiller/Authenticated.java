@@ -8,12 +8,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,7 +39,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
@@ -57,7 +56,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
 import cm.softinovplus.mobilebiller.dialog.LogoutDialog;
-import cm.softinovplus.mobilebiller.fragments.ForgotPasswordFragment;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
 public class Authenticated extends AppCompatActivity {
@@ -159,11 +157,11 @@ public class Authenticated extends AppCompatActivity {
                     startActivity(intent);
                 }
 
-                /*if (menuItem.getItemId() == R.id.register) {
+                if (menuItem.getItemId() == R.id.remote_receipt) {
                     mDrawerLayout.closeDrawers();
-                    Intent intent = new Intent(getApplicationContext(), Signup.class);
+                    Intent intent = new Intent(getApplicationContext(), ListeRecuDistant.class);
                     startActivity(intent);
-                }*/
+                }
 
                 return false;
             }

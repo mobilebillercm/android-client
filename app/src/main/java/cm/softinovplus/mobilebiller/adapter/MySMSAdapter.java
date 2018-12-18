@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Set;
 
 import cm.softinovplus.mobilebiller.BluetoothPrinterActivity;
-import cm.softinovplus.mobilebiller.PrintNewSMS;
 import cm.softinovplus.mobilebiller.R;
 import cm.softinovplus.mobilebiller.SMSsActivity;
 import cm.softinovplus.mobilebiller.TicketToShareActivity;

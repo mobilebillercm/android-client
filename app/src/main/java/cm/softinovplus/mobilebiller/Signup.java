@@ -6,8 +6,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.View;
@@ -19,11 +19,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.github.angads25.filepicker.controller.DialogSelectionListener;
-import com.github.angads25.filepicker.model.DialogConfigs;
-import com.github.angads25.filepicker.model.DialogProperties;
-import com.github.angads25.filepicker.view.FilePickerDialog;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,7 +29,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
@@ -54,7 +48,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
 import cm.softinovplus.mobilebiller.dialog.PolicyDialog;
-import cm.softinovplus.mobilebiller.fragments.SignUpFragment;
 import cm.softinovplus.mobilebiller.utils.CustomToast;
 import cm.softinovplus.mobilebiller.utils.Utils;
 
@@ -70,8 +63,6 @@ public class Signup extends AppCompatActivity {
     private String selectedRegion, logo_selected_path;
     private ArrayAdapter<CharSequence> adapter;
     private ProgressBar signup_loader;
-    public static DialogProperties properties;
-    public static FilePickerDialog dialogpicker;
     private View signeupview;
 
     @Override
@@ -120,8 +111,6 @@ public class Signup extends AppCompatActivity {
         selectedRegion = adapter.getItem(0).toString();
         Log.e("selectedRegion", selectedRegion);
 
-        properties = new DialogProperties();
-        dialogpicker = new FilePickerDialog(Signup.this,properties);
 
         logo_selected_path = "";
     }
@@ -205,27 +194,7 @@ public class Signup extends AppCompatActivity {
         edit_logo.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                Log.e("onFocusChange", "onFocusChange " + hasFocus);
-                if (hasFocus){
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                    properties.selection_type = DialogConfigs.FILE_SELECT;
-                    properties.root = new File(DialogConfigs.DEFAULT_DIR);
-                    properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
-                    properties.offset = new File(DialogConfigs.DEFAULT_DIR);
-                    properties.extensions = null;
-                    dialogpicker.setTitle("Choisir un Logo");
-                    dialogpicker.setDialogSelectionListener(new DialogSelectionListener() {
-                        @Override
-                        public void onSelectedFilePaths(String[] files) {
-                            //files is the array of the paths of files selected by the Application User.
-                            logo_selected_path = files[0];
-                            String []vet = files[0].split("\\/");
-                            edit_logo.setText(vet[vet.length-1]);
-                            Log.e("FILE SELECTED", files[0]);
-                        }
-                    });
-                    dialogpicker.show();
-                }
+
             }
         });
     }

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white"
+    tools:context="cm.softinovplus.mobilebiller.SearchResult">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -55,14 +56,54 @@
             android:background="@color/colorPrimaryDark" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/sms_list"
+    <!--<android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="5dp"
+        card_view:cardCornerRadius="5dp"
+        android:background="#00FFFFFF"
+        card_view:cardElevation="1.5dp"
+        android:layout_below="@id/logo_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"
+                android:id="@+id/editsearch"
+                android:background="@null"
+                android:hint="@string/keyword"
+                />
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/remote_sms_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="0dp"
         android:layout_below="@id/logo_content"
         android:layout_marginBottom="25dp"/>
+
+    <ProgressBar
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:id="@+id/load_remote_sms"
+        android:visibility="gone"
+        android:layout_below="@id/remote_sms_list"
+
+        />
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -74,13 +115,6 @@
         android:background="@color/colorPrimaryDark"
         android:paddingBottom="3dp"
         android:paddingTop="3dp">
-        <ImageView
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:src="@drawable/red_trash"
-            android:contentDescription="@string/app_name"
-            android:id="@+id/delete_all_sms"
-            android:layout_marginRight="50dp"/>
         <TextView
             android:layout_height="match_parent"
             android:layout_width="wrap_content"
@@ -103,3 +137,4 @@
     </LinearLayout>
 
 </RelativeLayout>
+

@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+
 /////////////////////////////////////////////////////////////////////////////
 ///
 ///		Liens utils:
@@ -23,7 +24,6 @@ import java.util.List;
 ///
 ///
 ////////////////////////////////////////////////////////////////////////////
-import cm.softinovplus.mobilebiller.BluetoothPrinterActivity;
 
 public class TraiteImage {
 	private BitSet dots;

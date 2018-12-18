@@ -25,7 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.pkmmte.view.CircularImageView;
 
 import org.json.JSONException;
 import org.json.JSONObject;

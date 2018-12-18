@@ -1,50 +1,17 @@
 package cm.softinovplus.mobilebiller.adapter;
 
-import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.Set;
-import java.util.UUID;
 
 import cm.softinovplus.mobilebiller.R;
-import cm.softinovplus.mobilebiller.db.SMSDataSource;
 import cm.softinovplus.mobilebiller.sms.SMS;
-import cm.softinovplus.mobilebiller.utils.TraiteImage;
-import cm.softinovplus.mobilebiller.utils.Utils;
 
 //import java.nio.ByteBuffer;
 

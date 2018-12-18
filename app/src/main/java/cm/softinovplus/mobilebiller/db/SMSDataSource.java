@@ -195,9 +195,8 @@ public class SMSDataSource {
 
 		Log.e("UPDATE RETURNED", "" + a);
 
-		SMS sms = getSMSById(id);
-
-		Log.e("SAVED SMS", sms.toString());
+		//SMS sms = getSMSById(id);
+		//Log.e("SAVED SMS", sms.toString());
 
 		return (a==1);
 	}
