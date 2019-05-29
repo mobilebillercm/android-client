@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
@@ -218,7 +219,6 @@ public class SignUpFragment extends Fragment  {
         edit_logo.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-               // Log.e("onFocusChange", "onFocusChange " + hasFocus);
                 if (hasFocus){
                    edit_logo.performClick();
                 }
@@ -360,6 +360,7 @@ public class SignUpFragment extends Fragment  {
             this.dialog.setVisibility(View.VISIBLE);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         protected String doInBackground(String... strings) {
             String resultat = "";

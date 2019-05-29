@@ -1,0 +1,32 @@
+{
+  "success":1,"faillure":0,
+  "response":[
+    {"id":22,"serviceid":"51cf8180-ef3b-11e8-af01-e3b5ef9de07b",
+      "clientid":"5726b550-d0a1-11e8-9971-d59fdf2d07e1",
+      "tenantid":"57261bf0-d0a1-11e8-bd1f-47fec029a2ff",
+      "startdate":1543675712,
+      "enddate":1546267712,
+      "enablementstatus":1,
+      "expirationstatus":0,
+      "reasonenablementchanged":null,
+      "name":"Service De test",
+      "short_description":"Service De test ...",
+      "long_description":"{\"Description\":\"Service De test ...\",\"performance\":\"Haute Performance\",\"utilisation\":\"Pret a Utiliser\",\"Avantage\":\"Augmente vos revenues\",\"Assistance\":\"24\\\/24 7jours\\\/7\",\"Support\":\"24\\\/24 7jours\\\/7\"}",
+      "created_at":"2018-12-01 14:48:32",
+      "updated_at":"2018-12-01 14:48:32",
+    },
+    {
+      "id":27,"serviceid":"61e857c0-cecd-11e8-bdce-49267d475577","clientid":"5726b550-d0a1-11e8-9971-d59fdf2d07e1",
+      "tenantid":"57261bf0-d0a1-11e8-bd1f-47fec029a2ff",
+      "startdate":1554277860,
+      "enddate":1585381860,
+      "enablementstatus":1,
+      "expirationstatus":0,
+      "reasonenablementchanged":null,
+      "name":"Impression des Recus",
+      "short_description":"Il permet d'imprimer les recus ...",
+      "long_description":"{\"Description\":\"Im pression des Recus\",\"performance\":\"Haute Performance\",\"utilisation\":\"Pret a Utiliser\",\"Avantage\":\"Augmente vos revenues\",\"Assistance\":\"24\\\/24 7jours\\\/7\",\"Support\":\"24\\\/24 7jours\\\/7\"}",
+      "created_at":"2018-12-07 15:54:42",
+      "updated_at":"2019-04-03 07:51:00",
+    }
+  ]}

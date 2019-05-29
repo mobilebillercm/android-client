@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatSpinner;
@@ -1275,6 +1276,7 @@ public class LoginFragment extends Fragment implements OnClickListener {
             this.loadMessage.setVisibility(View.VISIBLE);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
         @Override
         protected String doInBackground(String... strings) {
             String resultat = "";

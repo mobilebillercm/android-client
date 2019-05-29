@@ -915,6 +915,8 @@ public class Authenticated extends AppCompatActivity {
                             serviceDelay.setTextColor(Color.rgb(100, 0, 0));
                             serviceDelay.setText(Utils.makeDateDate(jsonArray.getJSONObject(i).getLong("enddate")) + "      ");
 
+                            Log.e("DELAI: " , "" + jsonArray.getJSONObject(i).getLong("enddate") );
+
                             LinearLayout myLinearLayout = new LinearLayout(Authenticated.this);
                             myLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
@@ -1145,7 +1147,7 @@ public class Authenticated extends AppCompatActivity {
                     editor.apply();
                     GetServices getServices = new GetServices(Authenticated.this, (ProgressBar) findViewById(R.id.id_image_loader), authPreferences.getString(Utils.USERID, ""),
                             jsonObject.getString(Utils.ACCESS_TOKEN));
-                    getServices.execute(Utils.HOST_CLIENT + "api/services/" + authPreferences.getString(Utils.USERID,""));
+                    getServices.execute(Utils.HOST_CLIENT + "api/register-service-access/" + authPreferences.getString(Utils.USERID,""));
                     //        public GetServices(Context context, ProgressBar dialog, String email, String access_token) {
 
                     /*RechargeAccountMenu.GetBalance getBalance = new RechargeAccountMenu.GetBalance(RechargeAccountMenu.this, balanceloader,

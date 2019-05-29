@@ -553,35 +553,36 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                                         transaction_amount = matcher.group(12) == null ? "0":matcher.group(12);
                                         transaction_currency = matcher.group(14);
                                         transaction_state = matcher.group(2);
-                                        String additionnel = (matcher.group(9) == null)?"":matcher.group(9);
-                                        transaction_beneficiary_name = matcher.group(8) + " " + additionnel;
+                                        String additionnel = (matcher.group(5) == null)?"":matcher.group(5);
+                                        transaction_beneficiary_name = matcher.group(4) + " " + additionnel;
                                         transaction_beneficiary_account_number = matcher.group(7);
-                                        transaction_date = "" + Utils.makeDateDate(System.currentTimeMillis());
+                                        transaction_date = "" + this.sms_sent_date;//"" + Utils.makeDateDate(System.currentTimeMillis());
                                         transaction_fees = matcher.group(15) == null ? "0":matcher.group(15);
                                         transaction_id = matcher.group(11) == null ? "0":matcher.group(11);;
                                         transaction_reference = "NA";
                                         transaction_balance = matcher.group(24);;
                                         String additional = (matcher.group(5) == null)?"":matcher.group(5);
-                                        transaction_made_by = matcher.group(4) + " " +  additional  + " (Tel: " + matcher.group(3) +")";
+                                        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                        transaction_made_by =sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);// matcher.group(4) + " " +  additional  + " (Tel: " + matcher.group(3) +")";
                                         booleen = true;
                                         Log.e("FOUND", "YES YES YES YES 4");
                                     }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Depot")){
                                         transaction_type = "Depot";//matcher.group(2);
-                                        transaction_amount = matcher.group(14) == null ? "0":matcher.group(14);
-                                        transaction_currency = matcher.group(16);
-                                        transaction_state = matcher.group(7);
-                                        String additionnel = (matcher.group(5) == null)?"":matcher.group(5);
-                                        transaction_beneficiary_name = matcher.group(4) + " " + additionnel;
+                                        transaction_amount = matcher.group(13) == null ? "0":matcher.group(13);
+                                        transaction_currency = matcher.group(15);
+                                        transaction_state = matcher.group(7);//"Succes";
+                                        transaction_beneficiary_name = matcher.group(4) + matcher.group(5);
                                         transaction_beneficiary_account_number = matcher.group(3);
-                                        transaction_date = "" + Utils.makeDateDate(System.currentTimeMillis());
-                                        transaction_fees = matcher.group(17) == null ? "0":matcher.group(17);
-                                        transaction_id = matcher.group(13) == null ? "0":matcher.group(13);;
+                                        transaction_date = "" + this.sms_sent_date;//matcher.group(7);
+                                        transaction_fees =  matcher.group(17);//"0";
+                                        transaction_id =  matcher.group(16);
                                         transaction_reference = "NA";
-                                        transaction_balance = matcher.group(26);;
-                                        String additional = (matcher.group(11) == null)?"":matcher.group(11);
-                                        transaction_made_by = matcher.group(10) + " " +  additional  + " (Tel: " + matcher.group(9) +")";
+                                        //String aa = (matcher.group(9) == null)?"":matcher.group(9);
+                                        transaction_balance = matcher.group(25);
+                                        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                        transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME); //matcher.group(10) + matcher.group(11);//
                                         booleen = true;
-                                        Log.e("FOUND", "YES YES YES YES 4");
+                                        Log.e("FOUND", "YES YES YES YES 7");
                                     }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Paiement")){
                                         transaction_type = "Paiement";//matcher.group(2);
                                         transaction_amount = matcher.group(1) == null ? "0":matcher.group(1);
@@ -868,7 +869,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     CharSequence name = context.getString(R.string.channel_name);
                     String description = context.getString(R.string.channel_description);
-                    int importance = NotificationManager.IMPORTANCE_MAX;
+                    int importance = NotificationManager.IMPORTANCE_HIGH;
                     NotificationChannel channel = new NotificationChannel(Utils.NOTIFICATION_CHANEL_ID, name, importance);
                     channel.setDescription(description);
                     // Register the channel with the system; you can't change the importance
