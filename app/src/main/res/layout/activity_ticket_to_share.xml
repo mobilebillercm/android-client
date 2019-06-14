@@ -8,8 +8,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:layout_below="@id/logo_content">
+        android:layout_marginTop="0dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -73,7 +72,6 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/tel"
                         android:textColor="@color/colorPrimaryDark"
-                        android:textStyle="bold"
 
                         />
                 </LinearLayout>
@@ -97,7 +95,6 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/email"
                         android:textColor="@color/colorPrimaryDark"
-                        android:textStyle="bold"
                         />
                 </LinearLayout>
 
@@ -113,7 +110,7 @@
                         android:id="@+id/num_contribuable_label"
                         android:textColor="@color/colorPrimaryDark"
                         android:textStyle="bold"
-                        android:text="N. Contribuable: "
+                        android:text="Nº Contrib.: "
 
                         />
                     <TextView
@@ -121,7 +118,6 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/num_contribuable"
                         android:textColor="@color/colorPrimaryDark"
-                        android:textStyle="bold"
 
                         />
                 </LinearLayout>
@@ -137,16 +133,13 @@
                         android:id="@+id/num_reg_commerce_label"
                         android:textColor="@color/colorPrimaryDark"
                         android:textStyle="bold"
-                        android:text="N. Registre Commerce: "
-
+                        android:text="Nº R.C: "
                         />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/num_registre_commer"
                         android:textColor="@color/colorPrimaryDark"
-                        android:textStyle="bold"
-
                         />
                 </LinearLayout>
 

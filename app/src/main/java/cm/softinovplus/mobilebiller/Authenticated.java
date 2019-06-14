@@ -707,6 +707,8 @@ public class Authenticated extends AppCompatActivity {
             editor.remove(Utils.NAME);
             editor.remove(Utils.EMAIL);
             editor.remove(Utils.TENANT_ID);
+            editor.remove(Utils.USERID);
+            //editor.clear();
             editor.apply();
 
             finish();

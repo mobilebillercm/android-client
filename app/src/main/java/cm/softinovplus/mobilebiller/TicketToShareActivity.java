@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -307,15 +308,19 @@ public class TicketToShareActivity extends AppCompatActivity {
     private File saveToExternalStorage(Bitmap bitmapImage){
         try {
             // image naming and path  to include sd card  appending name you choose for file
-            String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Utils.TICKET_IMAGE_FOLDER + "/" + sms.getId() + ".jpeg";
+            //String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Utils.TICKET_IMAGE_FOLDER + "/" + sms.getId() + ".jpeg";
 
-            File imageFile = new File(mPath);
+            String imageFileName = sms.getId() + ".jpeg";
+
+            File directory = getFilesDir();
+
+            File imageFile = new File(directory, imageFileName);
+
             FileOutputStream outputStream = new FileOutputStream(imageFile);
             int quality = 100;
             bitmapImage.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
-            outputStream.flush();
-            outputStream.close();
-
+            //outputStream.flush();
+            //outputStream.close();
             return imageFile;
         } catch (Throwable e) {
             // Several error may come out with file handling or DOM
@@ -327,7 +332,8 @@ public class TicketToShareActivity extends AppCompatActivity {
     private void sendTicket(File imageFile) {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
-        Uri uri = Uri.fromFile(imageFile);
+        Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID, imageFile);
+        //Uri uri = Uri.fromFile(imageFile);
         //intent.setDataAndType(uri, "image/*");
         intent.putExtra(Intent.EXTRA_STREAM, uri);
         intent.setType("image/*");

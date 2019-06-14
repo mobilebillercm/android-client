@@ -697,7 +697,9 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                 transaction_reference = matcher.group(15);
                                 transaction_balance = "0";
                                 String additional = (matcher.group(2) == null)?"":matcher.group(2);
-                                transaction_made_by = matcher.group(1) + additional;
+                                //transaction_made_by = matcher.group(1) + additional;
+                                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                 booleen = true;
                                 Log.e("FOUND", "YES YES YES YES 2");
                             }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Paiement de Frais d'examen")){
@@ -713,7 +715,9 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                 transaction_reference = matcher.group(17);
                                 transaction_balance = "0";
                                 String additional = (matcher.group(2) == null)?"":matcher.group(2);
-                                transaction_made_by = matcher.group(1) + additional;
+                                //transaction_made_by = matcher.group(1) + additional;
+                                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                 booleen = true;
                                 Log.e("FOUND", "YES YES YES YES 3");
                             }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Retrait")){
@@ -729,7 +733,9 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                 transaction_reference = "NA";
                                 transaction_balance = matcher.group(9);;
                                 String additional = (matcher.group(2) == null)?"":matcher.group(2);
-                                transaction_made_by = matcher.group(4) + " " +  matcher.group(5);
+                                //transaction_made_by = matcher.group(4) + " " +  matcher.group(5);
+                                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                 booleen = true;
                                 Log.e("FOUND", "YES YES YES YES 4");
                             }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Paiement")){
@@ -847,8 +853,10 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                     transaction_id = matcher.group(15);
                                     transaction_reference = matcher.group(15);
                                     transaction_balance = "0";
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                     String additional = (matcher.group(2) == null)?"":matcher.group(2);
-                                    transaction_made_by = matcher.group(1) + additional;
+                                    //transaction_made_by = matcher.group(1) + additional;
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 2");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Paiement de Frais d'examen")){
@@ -864,7 +872,9 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                     transaction_reference = matcher.group(17);
                                     transaction_balance = "0";
                                     String additional = (matcher.group(2) == null)?"":matcher.group(2);
-                                    transaction_made_by = matcher.group(1) + additional;
+                                    //transaction_made_by = matcher.group(1) + additional;
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 3");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Retrait")){
@@ -880,7 +890,9 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                     transaction_reference = "NA";
                                     transaction_balance = matcher.group(9);;
                                     String additional = (matcher.group(2) == null)?"":matcher.group(2);
-                                    transaction_made_by = matcher.group(4) + " " +  matcher.group(5);
+                                    //transaction_made_by = matcher.group(4) + " " +  matcher.group(5);
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 4");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Paiement")){
@@ -1003,7 +1015,10 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                     transaction_reference = matcher.group(15);
                                     transaction_balance = "0";
                                     String additional = (matcher.group(2) == null)?"":matcher.group(2);
-                                    transaction_made_by = matcher.group(1) + additional;
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME); //matcher.group(10) + " " +  additional  + " (Tel: " + matcher.group(9) +")";
+
+                                    //transaction_made_by = matcher.group(1) + additional;
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 2");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Paiement de Frais d'examen")){
@@ -1019,7 +1034,10 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                     transaction_reference = matcher.group(17);
                                     transaction_balance = "0";
                                     String additional = (matcher.group(2) == null)?"":matcher.group(2);
-                                    transaction_made_by = matcher.group(1) + additional;
+                                    //transaction_made_by = matcher.group(1) + additional;
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME); //matcher.group(10) + " " +  additional  + " (Tel: " + matcher.group(9) +")";
+
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 3");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Retrait")){
@@ -1036,24 +1054,27 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                     transaction_reference = "NA";
                                     transaction_balance = matcher.group(24);;
                                     String additional = (matcher.group(5) == null)?"":matcher.group(5);
-                                    transaction_made_by = matcher.group(4) + " " +  additional  + " (Tel: " + matcher.group(3) +")";
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME); //matcher.group(10) + " " +  additional  + " (Tel: " + matcher.group(9) +")";
+                                    //transaction_made_by = matcher.group(4) + " " +  additional  + " (Tel: " + matcher.group(3) +")";
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 4");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Depot")){
                                     transaction_type = "Depot";//matcher.group(2);
-                                    transaction_amount = matcher.group(14) == null ? "0":matcher.group(14);
-                                    transaction_currency = matcher.group(16);
+                                    transaction_amount = matcher.group(13) == null ? "0":matcher.group(13);
+                                    transaction_currency = matcher.group(15);
                                     transaction_state = matcher.group(7);
                                     String additionnel = (matcher.group(5) == null)?"":matcher.group(5);
                                     transaction_beneficiary_name = matcher.group(4) + " " + additionnel;
                                     transaction_beneficiary_account_number = matcher.group(3);
                                     transaction_date = "" + Utils.makeDateDate(System.currentTimeMillis());
                                     transaction_fees = matcher.group(17) == null ? "0":matcher.group(17);
-                                    transaction_id = matcher.group(13) == null ? "0":matcher.group(13);;
+                                    transaction_id = matcher.group(16) == null ? "0":matcher.group(16);;
                                     transaction_reference = "NA";
-                                    transaction_balance = matcher.group(26);;
+                                    transaction_balance = matcher.group(25);;
                                     String additional = (matcher.group(11) == null)?"":matcher.group(11);
-                                    transaction_made_by = matcher.group(10) + " " +  additional  + " (Tel: " + matcher.group(9) +")";
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME); //matcher.group(10) + " " +  additional  + " (Tel: " + matcher.group(9) +")";
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 4");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Paiement")){
@@ -1175,7 +1196,9 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                     transaction_reference = matcher.group(15);
                                     transaction_balance = "0";
                                     String additional = (matcher.group(2) == null)?"":matcher.group(2);
-                                    transaction_made_by = matcher.group(1) + additional;
+                                    //transaction_made_by = matcher.group(1) + additional;
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 2");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Paiement de Frais d'examen")){
@@ -1191,7 +1214,9 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                     transaction_reference = matcher.group(17);
                                     transaction_balance = "0";
                                     String additional = (matcher.group(2) == null)?"":matcher.group(2);
-                                    transaction_made_by = matcher.group(1) + additional;
+                                    //transaction_made_by = matcher.group(1) + additional;
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 3");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Retrait")){
@@ -1207,7 +1232,9 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                     transaction_reference = "NA";
                                     transaction_balance = matcher.group(24);;
                                     String additional = (matcher.group(5) == null)?"":matcher.group(5);
-                                    transaction_made_by = matcher.group(4) + " " +  additional + " (Tel: " + matcher.group(3) +")";
+                                    //transaction_made_by = matcher.group(4) + " " +  additional + " (Tel: " + matcher.group(3) +")";
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 4");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Depot")){
@@ -1224,7 +1251,9 @@ public class ListeRecuDistant extends AppCompatActivity implements RemoteSmsAdap
                                     transaction_reference = "NA";
                                     transaction_balance = matcher.group(26);;
                                     String additional = (matcher.group(11) == null)?"":matcher.group(11);
-                                    transaction_made_by = matcher.group(10) + " " +  additional + " (Tel: " + matcher.group(9) +")";
+                                    //transaction_made_by = matcher.group(10) + " " +  additional + " (Tel: " + matcher.group(9) +")";
+                                    SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Utils.APP_AUTHENTICATION, MODE_PRIVATE);
+                                    transaction_made_by = sharedPreferences.getString(Utils.TENANT_NAME,Utils.DEFAULT_TENANT_NAME);
                                     booleen = true;
                                     Log.e("FOUND", "YES YES YES YES 4");
                                 }else if (jsonObject.getString(Utils.TRANSACTIONTYPE).equals("Paiement")){
