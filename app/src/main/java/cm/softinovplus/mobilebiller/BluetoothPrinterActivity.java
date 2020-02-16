@@ -254,8 +254,8 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
 
                     String part0 = "Tel: " + sms.getPhone() + "\r\n";
                     part0 += "E-Mail: " + sms.getEmail() + "\r\n";
-                    part0 += "No. Contrib.: " + sms.getTaxpayernumber() + "\r\n";
-                    part0 += "Num. Reg. Comm.: " + sms.getNumbertraderegister() + "\r\n"+
+                    part0 += "N.C: " + sms.getTaxpayernumber() + "\r\n";
+                    part0 += "N.RC: " + sms.getNumbertraderegister() + "\r\n"+
                     "--------------------------------";
 
                     byte [] bytePart0 = part0.getBytes();
@@ -379,7 +379,7 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                         tous_les_donnee.add(B);
                     }
 
-                    byte[] label_compte_bene= "Num. Tel. Benef.: " .getBytes(); //+ ;
+                    byte[] label_compte_bene= "Tel. Benef.: " .getBytes(); //+ ;
                     for(int i=0; i<label_compte_bene.length; i++){
                         Byte B = new Byte(label_compte_bene[i]);
                         tous_les_donnee.add(B);
@@ -503,16 +503,13 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                         tous_les_donnee.add(B);
                     }
 
-                    byte[] label_fees= "Frais: " .getBytes(); //+ ;
+                    /*byte[] label_fees= "Frais: " .getBytes();
                     for(int i=0; i<label_fees.length; i++){
                         Byte B = new Byte(label_fees[i]);
                         tous_les_donnee.add(B);
                     }
 
-                    /*for(int i=0; i<right.length; i++){
-                        Byte B = new Byte(right[i]);
-                        tous_les_donnee.add(B);
-                    }*/
+
 
                     byte [] fees = (sms.getTransaction_fees() + "  " + sms.getTransaction_currency() + "\r\n").getBytes();
                     for(int i=0; i<fees.length; i++){
@@ -524,7 +521,7 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                     for(int i=0; i<left.length; i++){
                         Byte B = new Byte(left[i]);
                         tous_les_donnee.add(B);
-                    }
+                    }*/
 
                     byte[] label_transaction_date= "Transaction du: " .getBytes(); //+ ;
                     for(int i=0; i<label_transaction_date.length; i++){
@@ -594,7 +591,7 @@ public class BluetoothPrinterActivity extends AppCompatActivity {
                             tous_les_donnee.add(B);
                         }
 
-                        String duplicata = "\r\nDUPLICATA\r\n";
+                        String duplicata = "DUPLICATA";
 
                         byte [] duplicataByte = duplicata.getBytes();
                         //mmOutStream.write(left);

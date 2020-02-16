@@ -69,7 +69,7 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by nkalla on 16/09/18.
  */
 
-/*
+/**
     Messagesw
 
     1- Vous avez envoye 10000 FCFA a LEONARD ZEBAZE (237674769537) le 2018-10-05 09:36:36. Message de l'expediteur: . Votre nouveau solde est de 8225 FCFA. Transaction Id: 402965086
@@ -83,6 +83,7 @@ import static android.content.Context.MODE_PRIVATE;
     8- Paiement reussi de TAFOUNG CABREL LYCEE TECHNIQUE DE NYLON-BACCALAUREAT Date 06/09/2018 11:30:00 Montant 18500 XAF Pay ID 12398. Votre Pay ID est votre preuve de paiement.
     9-
 
+Vous avez envoye 100 FCFA a CEYDE-BAR-TIKENG NDEIDZO (237653448359) le 2019-08-14 12:58:30. Message de l'expediteur: . Votre nouveau solde est de: 310669 FCFA. Transaction Id: 824467534.
 
     ///////////////// ORANGE /////////////////////////////////////
 
